@@ -1,0 +1,29 @@
+{
+  "name": "connex-framework",
+  "version": "1.0.0",
+  "description": "connex framework",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc -p .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qianbin/connex-framework.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/qianbin/connex-framework/issues"
+  },
+  "homepage": "https://github.com/qianbin/connex-framework#readme",
+  "devDependencies": {
+    "@vechain/connex": "^1.2.3",
+    "ts-node": "^8.2.0",
+    "tslint": "^5.17.0",
+    "typescript": "^3.5.1"
+  },
+  "dependencies": {
+    "@vechain/abi": "^1.0.1"
+  }
+}
