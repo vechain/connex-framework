@@ -1,6 +1,6 @@
 {
   "name": "@vechain/connex-framework",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha",
   "description": "connex framework",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -21,12 +21,12 @@
   },
   "homepage": "https://github.com/qianbin/connex-framework#readme",
   "devDependencies": {
-    "@vechain/connex": "^1.2.3",
     "ts-node": "^8.2.0",
     "tslint": "^5.17.0",
     "typescript": "^3.5.1"
   },
   "dependencies": {
-    "@vechain/abi": "^1.0.1"
+    "@vechain/abi": "^1.0.1",
+    "@vechain/connex": "^1.2.3"
   }
 }
