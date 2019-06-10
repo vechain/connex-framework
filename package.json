@@ -1,8 +1,9 @@
 {
-  "name": "connex-framework",
+  "name": "@vechain/connex-framework",
   "version": "1.0.0",
   "description": "connex framework",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -p .",
     "lint": "tslint -p .",
