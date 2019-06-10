@@ -1,6 +1,5 @@
 import { abi } from '@vechain/abi'
 import * as V from './validator'
-import { Context } from './context'
 
 export function newMethod(
     ctx: Context,

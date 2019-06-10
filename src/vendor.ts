@@ -1,7 +1,6 @@
-import { Driver } from './driver'
 import * as V from './validator'
 
-export function newVendor(driver: Driver): Connex.Vendor {
+export function newVendor(driver: Connex.Driver): Connex.Vendor {
     const poller = newOwnedAddressesPoller(driver)
     return {
         sign: (kind: 'tx' | 'cert') => {
@@ -21,7 +20,7 @@ export function newVendor(driver: Driver): Connex.Vendor {
     }
 }
 
-function newOwnedAddressesPoller(driver: Driver) {
+function newOwnedAddressesPoller(driver: Connex.Driver) {
     let addresses = [] as string[]
     (async () => {
         for (; ;) {
@@ -38,7 +37,7 @@ function newOwnedAddressesPoller(driver: Driver) {
     }
 }
 
-function newTxSigningService(driver: Driver): Connex.Vendor.TxSigningService {
+function newTxSigningService(driver: Connex.Driver): Connex.Vendor.TxSigningService {
     const opts: {
         signer?: string
         gas?: number
@@ -104,7 +103,7 @@ function newTxSigningService(driver: Driver): Connex.Vendor.TxSigningService {
     }
 }
 
-function newCertSigningService(driver: Driver): Connex.Vendor.CertSigningService {
+function newCertSigningService(driver: Connex.Driver): Connex.Vendor.CertSigningService {
     const opts: {
         signer?: string
         link?: string

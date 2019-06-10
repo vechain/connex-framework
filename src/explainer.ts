@@ -1,5 +1,4 @@
 import * as V from './validator'
-import { Context } from './context'
 
 export function newExplainer(ctx: Context): Connex.Thor.Explainer {
     const opts: {

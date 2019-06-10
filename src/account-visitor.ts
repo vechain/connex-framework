@@ -1,7 +1,6 @@
 import { newEventVisitor } from './event-visitor'
 import { newMethod } from './method'
 import * as V from './validator'
-import { Context } from './context'
 
 export function newAccountVisitor(
     ctx: Context,

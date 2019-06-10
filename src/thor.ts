@@ -4,11 +4,9 @@ import { newTxVisitor } from './tx-visitor'
 import { newFilter } from './filter'
 import { newHeadPoller } from './head-poller'
 import { newExplainer } from './explainer'
-import { Driver } from './driver'
-import { Context } from './context'
 
 export function newThor(
-    driver: Driver,
+    driver: Connex.Driver,
     genesis: Connex.Thor.Block,
     initialHead?: Connex.Thor.Status['head']
 ): Connex.Thor {

@@ -1,7 +1,6 @@
 import { abi } from '@vechain/abi'
 import { newFilter } from './filter'
 import * as V from './validator'
-import { Context } from './context'
 
 export function newEventVisitor(
     ctx: Context,

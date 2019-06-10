@@ -1,5 +1,4 @@
 import * as V from './validator'
-import { Context } from './context'
 
 const MAX_LIMIT = 256
 

@@ -1,6 +1,7 @@
+import '@vechain/connex'
+import './connex.driver'
 import { newThor } from './thor'
 import { newVendor } from './vendor'
-import { Driver } from './driver'
 import { version as connexVersion } from '@vechain/connex/package.json'
 
 export class ConnexImpl implements Connex {
@@ -9,7 +10,7 @@ export class ConnexImpl implements Connex {
     public readonly vendor: Connex.Vendor
 
     constructor(
-        driver: Driver,
+        driver: Connex.Driver,
         genesis: Connex.Thor.Block,
         initialHead?: Connex.Thor.Status['head']
     ) {
@@ -17,5 +18,3 @@ export class ConnexImpl implements Connex {
         this.vendor = newVendor(driver)
     }
 }
-
-export { Driver }

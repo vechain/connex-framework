@@ -1,7 +1,5 @@
-import { Driver } from './driver'
-
 export function newHeadPoller(
-    driver: Driver,
+    driver: Connex.Driver,
     genesisTs: number,
     initialHead: Connex.Thor.Status['head']
 ) {

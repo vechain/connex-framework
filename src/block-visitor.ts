@@ -1,4 +1,3 @@
-import { Context } from './context'
 import * as V from './validator'
 
 export function newBlockVisitor(
