@@ -1,17 +1,21 @@
 import { Driver } from './driver'
 
-export function newHeadTracker(driver: Driver, genesisTs: number, initialHead: Connex.Thor.Status['head']) {
+export function newHeadPoller(
+    driver: Driver,
+    genesisTs: number,
+    initialHead: Connex.Thor.Status['head']
+) {
     let head = { ...initialHead }
     let tickerResolvers: Array<() => void> = [];
 
     (async () => {
         for (; ;) {
             try {
-                head = await driver.pullHead()
+                head = await driver.pollHead()
                 const tickerResolversCopy = tickerResolvers
                 tickerResolvers = []
                 tickerResolversCopy.forEach(r => r())
-            // tslint:disable-next-line:no-empty
+                // tslint:disable-next-line:no-empty
             } catch (err) {
             }
         }

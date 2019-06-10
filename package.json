@@ -5,14 +5,15 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc -p .",
+    "lint": "tslint -p .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/qianbin/connex-framework.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "qianbin",
+  "license": "LGPL-3.0",
   "bugs": {
     "url": "https://github.com/qianbin/connex-framework/issues"
   },

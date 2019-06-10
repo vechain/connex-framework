@@ -2,24 +2,32 @@ import { Driver } from './driver'
 import * as V from './validator'
 
 export function newVendor(driver: Driver): Connex.Vendor {
-    const addrTracker = newOwnedAddressesTracker(driver)
+    const poller = newOwnedAddressesPoller(driver)
     return {
         sign: (kind: 'tx' | 'cert') => {
-            return (kind === 'tx' ? newTxSigningService(driver) : newCertSigningService(driver)) as any
+            if (kind === 'tx') {
+                return newTxSigningService(driver) as any
+            } else if (kind === 'cert') {
+                return newCertSigningService(driver) as any
+            } else {
+                throw new V.BadParameter('unsupported message kind')
+            }
         },
         owned: (addr) => {
-            return addrTracker.addresses.indexOf(addr) >= 0
+            V.ensure(V.isAddress(addr), 'expected address type')
+            return poller.addresses
+                .findIndex(a => a.toLowerCase() === addr.toLowerCase()) >= 0
         }
     }
 }
 
-function newOwnedAddressesTracker(driver: Driver) {
+function newOwnedAddressesPoller(driver: Driver) {
     let addresses = [] as string[]
     (async () => {
         for (; ;) {
             try {
-                addresses = await driver.pullOwnedAddresses()
-            // tslint:disable-next-line:no-empty
+                addresses = await driver.pollOwnedAddresses()
+                // tslint:disable-next-line:no-empty
             } catch {
             }
         }
@@ -64,7 +72,7 @@ function newTxSigningService(driver: Driver): Connex.Vendor.TxSigningService {
             opts.comment = text
             return this
         },
-        async request(msg) {
+        request(msg) {
             V.ensure(Array.isArray(msg), 'expected array')
             msg = msg.map((c, i) => {
                 c = { ...c }
@@ -83,8 +91,15 @@ function newTxSigningService(driver: Driver): Connex.Vendor.TxSigningService {
                 V.ensure(typeof c.comment === 'string', `'#${i}.comment' expected string`)
                 return c
             })
-            const r = await driver.buildTx(msg, opts)
-            return r.sign()
+
+            return (async () => {
+                try {
+                    const r = await driver.signTx(msg, opts)
+                    return await r.doSign()
+                } catch (err) {
+                    throw new Rejected(err.message)
+                }
+            })()
         }
     }
 }
@@ -113,7 +128,21 @@ function newCertSigningService(driver: Driver): Connex.Vendor.CertSigningService
             V.ensure(typeof msg.payload === 'object', `'payload' expected object`)
             V.ensure(msg.payload.type === 'text', `'payload.type' unsupported`)
             V.ensure(typeof msg.payload.content === 'string', `'payload.content' expected string`)
-            return driver.signCert(msg, opts)
+
+            return (async () => {
+                try {
+                    return await driver.signCert(msg, opts)
+                } catch (err) {
+                    throw new Rejected(err.message)
+                }
+            })()
         }
+    }
+}
+
+class Rejected extends Error {
+    constructor(msg: string) {
+        super(msg)
+        this.name = Rejected.name
     }
 }

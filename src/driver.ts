@@ -1,6 +1,6 @@
 
 export interface Driver {
-    pullHead(): Promise<Connex.Thor.Status['head']>
+    pollHead(): Promise<Connex.Thor.Status['head']>
 
     getBlock(rev: string | number): Promise<Connex.Thor.Block | null>
     getTransaction(id: string, head: string): Promise<Connex.Thor.Transaction | null>
@@ -45,8 +45,8 @@ export interface Driver {
         cacheTies?: string[]
     ): Promise<Connex.Thor.VMOutput[]>
 
-    pullOwnedAddresses(): Promise<string[]>
-    buildTx(
+    pollOwnedAddresses(): Promise<string[]>
+    signTx(
         msg: Connex.Vendor.SigningService.TxMessage,
         options: {
             delegated?: boolean,
@@ -57,11 +57,11 @@ export interface Driver {
             comment?: string
         }
     ): Promise<{
-        unsignedTx: {
+        unsignedTx?: {
             raw: string,
             origin: string
         },
-        sign(delegatorSignature?: string): Promise<Connex.Vendor.SigningService.TxResponse>
+        doSign(delegatorSignature?: string): Promise<Connex.Vendor.SigningService.TxResponse>
     }>
 
     signCert(

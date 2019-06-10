@@ -1,7 +1,7 @@
 import * as V from './validator'
-import { Driver } from './driver'
+import { Context } from './context'
 
-export function newExplainer(driver: Driver, headId: () => string): Connex.Thor.Explainer {
+export function newExplainer(ctx: Context): Connex.Thor.Explainer {
     const opts: {
         caller?: string
         gas?: number
@@ -42,12 +42,12 @@ export function newExplainer(driver: Driver, headId: () => string): Connex.Thor.
                 }
             })
 
-            return driver.explain(
+            return ctx.driver.explain(
                 {
                     clauses,
                     ...opts
                 },
-                headId())
+                ctx.head.id)
         }
     }
 }

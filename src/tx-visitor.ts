@@ -1,13 +1,17 @@
-import { Driver } from './driver'
+import { Context } from './context'
+import * as V from './validator'
 
 export function newTxVisitor(
-    driver: Driver,
-    id: string,
-    headId: () => string
+    ctx: Context,
+    id: string
 ): Connex.Thor.TransactionVisitor {
+    V.ensure(V.isBytes32(id), `'id' expected bytes32 in hex string`)
+
     return {
-        get id() { return id },
-        get: () => driver.getTransaction(id, headId()),
-        getReceipt: () => driver.getReceipt(id, headId())
+        get id() {
+            return id
+        },
+        get: () => ctx.driver.getTransaction(id, ctx.head.id),
+        getReceipt: () => ctx.driver.getReceipt(id, ctx.head.id)
     }
 }

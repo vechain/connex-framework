@@ -1,31 +1,31 @@
 import { newEventVisitor } from './event-visitor'
 import { newMethod } from './method'
 import * as V from './validator'
-import { Driver } from './driver'
+import { Context } from './context'
 
 export function newAccountVisitor(
-    driver: Driver,
-    addr: string,
-    headId: () => string
+    ctx: Context,
+    addr: string
 ): Connex.Thor.AccountVisitor {
+    V.ensure(V.isAddress(addr), `'addr' expected address type`)
+
     return {
         get address() { return addr },
         get: () => {
-
-            return driver.getAccount(addr, headId())
+            return ctx.driver.getAccount(addr, ctx.head.id)
         },
         getCode: () => {
-            return driver.getCode(addr, headId())
+            return ctx.driver.getCode(addr, ctx.head.id)
         },
         getStorage: key => {
             V.ensure(V.isBytes32(key), `'key' expected bytes32 in hex string`)
-            return driver.getStorage(addr, key, headId())
+            return ctx.driver.getStorage(addr, key, ctx.head.id)
         },
         method: jsonABI => {
-            return newMethod(driver, addr, jsonABI, headId)
+            return newMethod(ctx, addr, jsonABI)
         },
         event: jsonABI => {
-            return newEventVisitor(driver, jsonABI, addr)
+            return newEventVisitor(ctx, jsonABI, addr)
         }
     }
 }

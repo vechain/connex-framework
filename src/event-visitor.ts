@@ -1,10 +1,10 @@
 import { abi } from '@vechain/abi'
 import { newFilter } from './filter'
 import * as V from './validator'
-import { Driver } from './driver'
+import { Context } from './context'
 
 export function newEventVisitor(
-    driver: Driver,
+    ctx: Context,
     jsonABI: object,
     addr: string
 ): Connex.Thor.EventVisitor {
@@ -40,7 +40,7 @@ export function newEventVisitor(
             } else {
                 criteriaSet = indexed.map(i => this.asCriteria(i))
             }
-            const filter = newFilter(driver, 'event').criteria(criteriaSet)
+            const filter = newFilter(ctx, 'event').criteria(criteriaSet)
             return {
                 criteria(set) {
                     filter.criteria(set)

@@ -1,12 +1,11 @@
 import { abi } from '@vechain/abi'
 import * as V from './validator'
-import { Driver } from './driver'
+import { Context } from './context'
 
 export function newMethod(
-    driver: Driver,
+    ctx: Context,
     addr: string,
-    jsonABI: object,
-    headId: () => string
+    jsonABI: object
 ): Connex.Thor.Method {
     const coder = (() => {
         try {
@@ -75,12 +74,12 @@ export function newMethod(
             }
         },
         call(...args) {
-            return driver.explain(
+            return ctx.driver.explain(
                 {
                     clauses: [this.asClause(...args)],
                     ...opts
                 },
-                headId(),
+                ctx.head.id,
                 cacheTies)
                 .then(outputs => outputs[0])
                 .then(output => {
