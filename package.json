@@ -7,6 +7,7 @@
   "scripts": {
     "build": "tsc -p .",
     "lint": "tslint -p .",
+    "prepare": "rm -rf dist/; npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
