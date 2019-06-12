@@ -44,6 +44,7 @@ function newTxSigningService(driver: Connex.Driver): Connex.Vendor.TxSigningServ
         dependsOn?: string
         link?: string
         comment?: string
+        delegateHandler?: Connex.Vendor.SigningService.DelegationHandler
     } = {}
     return {
         signer(addr) {
@@ -71,6 +72,11 @@ function newTxSigningService(driver: Connex.Driver): Connex.Vendor.TxSigningServ
             opts.comment = text
             return this
         },
+        delegate(handler) {
+            V.ensure(typeof handler === 'function', `'handler' expected function`)
+            opts.delegateHandler = handler
+            return this
+        },
         request(msg) {
             V.ensure(Array.isArray(msg), 'expected array')
             msg = msg.map((c, i) => {
@@ -94,6 +100,10 @@ function newTxSigningService(driver: Connex.Driver): Connex.Vendor.TxSigningServ
             return (async () => {
                 try {
                     const r = await driver.signTx(msg, opts)
+                    if (opts.delegateHandler && r.unsignedTx) {
+                        const obj = await opts.delegateHandler(r.unsignedTx)
+                        return await r.doSign(obj.signature)
+                    }
                     return await r.doSign()
                 } catch (err) {
                     throw new Rejected(err.message)
