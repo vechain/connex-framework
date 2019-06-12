@@ -78,7 +78,7 @@ export function newMethod(
                     clauses: [this.asClause(...args)],
                     ...opts
                 },
-                ctx.head.id,
+                ctx.trackedHead.id,
                 cacheTies)
                 .then(outputs => outputs[0])
                 .then(output => {

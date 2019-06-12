@@ -1,23 +1,21 @@
-export function newHeadPoller(
-    driver: Connex.Driver,
-    genesisTs: number,
-    initialHead: Connex.Thor.Status['head']
-) {
-    let head = { ...initialHead }
-    let tickerResolvers: Array<() => void> = [];
+export function newHeadTracker(driver: Connex.Driver) {
+    let head = { ...driver.head }
+    let resolvers: Array<() => void> = [];
 
     (async () => {
         for (; ;) {
-            try {
-                head = await driver.pollHead()
-                const tickerResolversCopy = tickerResolvers
-                tickerResolvers = []
-                tickerResolversCopy.forEach(r => r())
-                // tslint:disable-next-line:no-empty
-            } catch (err) {
+            await new Promise(resolve => setTimeout(resolve, 2 * 1000))
+            const newHead = { ...driver.head }
+            if (newHead.id !== head.id && newHead.number >= head.number) {
+                head = newHead
+                const resolversCopy = resolvers
+                resolvers = []
+                resolversCopy.forEach(r => r())
             }
         }
     })()
+
+    const genesisTs = driver.genesis.timestamp
 
     return {
         get head() { return head },
@@ -40,7 +38,7 @@ export function newHeadPoller(
                             lastHeadId = head.id
                             return resolve()
                         }
-                        tickerResolvers.push(() => {
+                        resolvers.push(() => {
                             resolve()
                             lastHeadId = head.id
                         })

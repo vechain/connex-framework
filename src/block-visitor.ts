@@ -9,7 +9,7 @@ export function newBlockVisitor(
     } else if (typeof revision === 'number') {
         V.ensure(V.isUint32(revision), `'revision' expected non-neg 32bit integer`)
     } else if (typeof revision === 'undefined') {
-        revision = ctx.head.id
+        revision = ctx.trackedHead.id
     } else {
         throw new V.BadParameter(`'revision' has invalid type`)
     }

@@ -11,14 +11,14 @@ export function newAccountVisitor(
     return {
         get address() { return addr },
         get: () => {
-            return ctx.driver.getAccount(addr, ctx.head.id)
+            return ctx.driver.getAccount(addr, ctx.trackedHead.id)
         },
         getCode: () => {
-            return ctx.driver.getCode(addr, ctx.head.id)
+            return ctx.driver.getCode(addr, ctx.trackedHead.id)
         },
         getStorage: key => {
             V.ensure(V.isBytes32(key), `'key' expected bytes32 in hex string`)
-            return ctx.driver.getStorage(addr, key, ctx.head.id)
+            return ctx.driver.getStorage(addr, key, ctx.trackedHead.id)
         },
         method: jsonABI => {
             return newMethod(ctx, addr, jsonABI)

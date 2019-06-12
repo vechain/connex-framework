@@ -1,7 +1,6 @@
 import * as V from './validator'
 
 export function newVendor(driver: Connex.Driver): Connex.Vendor {
-    const poller = newOwnedAddressesPoller(driver)
     return {
         sign: (kind: 'tx' | 'cert') => {
             if (kind === 'tx') {
@@ -14,26 +13,8 @@ export function newVendor(driver: Connex.Driver): Connex.Vendor {
         },
         owned: (addr) => {
             V.ensure(V.isAddress(addr), 'expected address type')
-            return poller.addresses
-                .findIndex(a => a.toLowerCase() === addr.toLowerCase()) >= 0
+            return driver.isAddressOwned(addr.toLowerCase())
         }
-    }
-}
-
-function newOwnedAddressesPoller(driver: Connex.Driver) {
-    let addresses = [] as string[]
-    (async () => {
-        for (; ;) {
-            try {
-                addresses = await driver.pollOwnedAddresses()
-                // tslint:disable-next-line:no-empty
-            } catch {
-            }
-        }
-    })()
-
-    return {
-        get addresses() { return addresses }
     }
 }
 

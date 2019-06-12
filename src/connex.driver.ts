@@ -1,7 +1,8 @@
 
 declare namespace Connex {
     interface Driver {
-        pollHead(): Promise<Thor.Status['head']>
+        readonly genesis: Thor.Block
+        readonly head: Thor.Status['head']
 
         getBlock(rev: string | number): Promise<Thor.Block | null>
         getTransaction(id: string, head: string): Promise<Thor.Transaction | null>
@@ -46,7 +47,6 @@ declare namespace Connex {
             cacheTies?: string[]
         ): Promise<Thor.VMOutput[]>
 
-        pollOwnedAddresses(): Promise<string[]>
         signTx(
             msg: Vendor.SigningService.TxMessage,
             options: {
@@ -72,5 +72,7 @@ declare namespace Connex {
                 link?: string
             }
         ): Promise<Vendor.SigningService.CertResponse>
+
+        isAddressOwned(addr: string): boolean
     }
 }

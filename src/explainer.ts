@@ -46,7 +46,7 @@ export function newExplainer(ctx: Context): Connex.Thor.Explainer {
                     clauses,
                     ...opts
                 },
-                ctx.head.id)
+                ctx.trackedHead.id)
         }
     }
 }

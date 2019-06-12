@@ -4,17 +4,13 @@ import { newThor } from './thor'
 import { newVendor } from './vendor'
 import { version as connexVersion } from '@vechain/connex/package.json'
 
-export class ConnexImpl implements Connex {
+export class Framework implements Connex {
     public readonly version = connexVersion
     public readonly thor: Connex.Thor
     public readonly vendor: Connex.Vendor
 
-    constructor(
-        driver: Connex.Driver,
-        genesis: Connex.Thor.Block,
-        initialHead?: Connex.Thor.Status['head']
-    ) {
-        this.thor = newThor(driver, genesis, initialHead)
+    constructor(driver: Connex.Driver) {
+        this.thor = newThor(driver)
         this.vendor = newVendor(driver)
     }
 }
