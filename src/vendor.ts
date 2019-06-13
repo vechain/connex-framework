@@ -83,6 +83,9 @@ function newTxSigningService(driver: Connex.Driver): Connex.Vendor.TxSigningServ
                     const r = await driver.signTx(msg, opts)
                     if (opts.delegateHandler && r.unsignedTx) {
                         const obj = await opts.delegateHandler(r.unsignedTx)
+                        V.ensure(obj instanceof Object, `'delegate handler' expected returns object`)
+                        V.ensure(V.isHexBytes(obj.signature) && obj.signature.length === 132,
+                            `'delegate handler' expected returns valid signature`)
                         return await r.doSign(obj.signature)
                     }
                     return await r.doSign()
