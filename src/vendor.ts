@@ -69,7 +69,7 @@ function newTxSigningService(driver: Connex.Driver): Connex.Vendor.TxSigningServ
 
                 V.ensure(!c.to || V.isAddress(c.to), `'#${i}.to' expected null or address type`)
                 V.ensure(typeof c.value === 'string' ?
-                    (/^0x[0-9a-f]+$/i.test(c.value) || /^[1-9][0-9]+$/.test(c.value))
+                    (/^0x[0-9a-f]+$/i.test(c.value) || /^[0-9]+$/.test(c.value))
                     : Number.isSafeInteger(c.value),
                     `'#${i}.value' expected non-negative safe integer or integer in hex|dec string`)
                 V.ensure(/^0x([0-9a-f][0-9a-f])*$/i.test(c.data),
