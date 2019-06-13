@@ -4,13 +4,23 @@ declare namespace Connex {
         readonly genesis: Thor.Block
         readonly head: Thor.Status['head']
 
-        getBlock(rev: string | number): Promise<Thor.Block | null>
+        getBlock(revision: string | number): Promise<Thor.Block | null>
         getTransaction(id: string, head: string): Promise<Thor.Transaction | null>
         getReceipt(id: string, head: string): Promise<Thor.Receipt | null>
 
-        getAccount(addr: string, rev: string): Promise<Thor.Account>
-        getCode(addr: string, rev: string): Promise<Thor.Code>
-        getStorage(addr: string, key: string, rev: string): Promise<Thor.Storage>
+        getAccount(addr: string, revision: string): Promise<Thor.Account>
+        getCode(addr: string, revision: string): Promise<Thor.Code>
+        getStorage(addr: string, key: string, revision: string): Promise<Thor.Storage>
+        explain(
+            arg: {
+                clauses: Thor.Clause[],
+                caller?: string
+                gas?: number
+                gasPrice?: string
+            },
+            revision: string,
+            cacheTies?: string[]
+        ): Promise<Thor.VMOutput[]>
 
         filterEventLogs(
             arg: {
@@ -35,17 +45,6 @@ declare namespace Connex {
                 order: 'asc' | 'desc'
             }
         ): Promise<Thor.Transfer[]>
-
-        explain(
-            arg: {
-                clauses: Thor.Clause[],
-                caller?: string
-                gas?: number
-                gasPrice?: string
-            },
-            rev: string,
-            cacheTies?: string[]
-        ): Promise<Thor.VMOutput[]>
 
         signTx(
             msg: Vendor.SigningService.TxMessage,

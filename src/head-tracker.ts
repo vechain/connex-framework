@@ -4,7 +4,6 @@ export function newHeadTracker(driver: Connex.Driver) {
 
     (async () => {
         for (; ;) {
-            await new Promise(resolve => setTimeout(resolve, 2 * 1000))
             const newHead = { ...driver.head }
             if (newHead.id !== head.id && newHead.number >= head.number) {
                 head = newHead
@@ -12,6 +11,7 @@ export function newHeadTracker(driver: Connex.Driver) {
                 resolvers = []
                 resolversCopy.forEach(r => r())
             }
+            await new Promise(resolve => setTimeout(resolve, 1 * 1000))
         }
     })()
 
