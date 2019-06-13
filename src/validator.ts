@@ -26,9 +26,9 @@ export function isUint32(val: number) {
 export class BadParameter extends Error {
     constructor(msg: string) {
         super(msg)
-        this.name = BadParameter.name
     }
 }
+BadParameter.prototype.name = BadParameter.name
 
 export function ensure(b: boolean, msg: string) {
     if (!b) {

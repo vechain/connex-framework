@@ -136,6 +136,7 @@ function newCertSigningService(driver: Connex.Driver): Connex.Vendor.CertSigning
 class Rejected extends Error {
     constructor(msg: string) {
         super(msg)
-        this.name = Rejected.name
     }
 }
+
+Rejected.prototype.name = Rejected.name
