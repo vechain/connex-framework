@@ -4,41 +4,44 @@ import * as V from './validator'
 
 export function newEventVisitor(
     ctx: Context,
-    jsonABI: object,
-    addr: string
+    addr: string,
+    coder: abi.Event
 ): Connex.Thor.EventVisitor {
 
-    const coder = (() => {
-        try {
-            return new abi.Event(JSON.parse(JSON.stringify(jsonABI)))
-        } catch (err) {
-            throw new V.BadParameter(`'abi' is invalid: ${err.message}`)
+    const encode = (indexed: object) => {
+        const topics = coder.encode(indexed)
+        return {
+            address: addr,
+            topic0: topics[0] || undefined,
+            topic1: topics[1] || undefined,
+            topic2: topics[2] || undefined,
+            topic3: topics[3] || undefined,
+            topic4: topics[4] || undefined
         }
-    })()
+    }
 
     return {
         asCriteria: indexed => {
             try {
-                const topics = coder.encode(indexed)
-                return {
-                    address: addr,
-                    topic0: topics[0] || undefined,
-                    topic1: topics[1] || undefined,
-                    topic2: topics[2] || undefined,
-                    topic3: topics[3] || undefined,
-                    topic4: topics[4] || undefined
-                }
+                return encode(indexed)
             } catch (err) {
-                throw new V.BadParameter(`'indexed' can not be encoded: ${err.message}`)
+                throw new V.BadParameter(`arg0 can not be encoded: ${err.message}`)
             }
         },
-        filter(indexed) {
-            let criteriaSet: Connex.Thor.Event.Criteria[]
+        filter: (indexed) => {
+            V.ensure(Array.isArray(indexed), 'arg0 expected array')
+
             if (indexed.length === 0) {
-                criteriaSet = [this.asCriteria({})]
-            } else {
-                criteriaSet = indexed.map(i => this.asCriteria(i))
+                indexed = [{}]
             }
+
+            const criteriaSet = indexed.map((o, i) => {
+                try {
+                    return encode(o)
+                } catch (err) {
+                    throw new V.BadParameter(`arg0.#${i} can not be encoded: ${err.message}`)
+                }
+            })
             const filter = newFilter(ctx, 'event').criteria(criteriaSet)
             return {
                 criteria(set) {
@@ -56,7 +59,7 @@ export function newEventVisitor(
                 apply(offset: number, limit: number) {
                     return filter.apply(offset, limit)
                         .then(events => events.map(event => {
-                            const decoded = coder.decode(event.data, event.topics) as any
+                            const decoded = coder.decode(event.data, event.topics)
                             return { ...event, decoded }
                         }))
                 }

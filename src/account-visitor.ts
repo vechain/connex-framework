@@ -1,13 +1,12 @@
 import { newEventVisitor } from './event-visitor'
 import { newMethod } from './method'
+import { abi } from '@vechain/abi'
 import * as V from './validator'
 
 export function newAccountVisitor(
     ctx: Context,
     addr: string
 ): Connex.Thor.AccountVisitor {
-    V.ensure(V.isAddress(addr), `'addr' expected address type`)
-
     return {
         get address() { return addr },
         get: () => {
@@ -17,14 +16,27 @@ export function newAccountVisitor(
             return ctx.driver.getCode(addr, ctx.trackedHead.id)
         },
         getStorage: key => {
-            V.ensure(V.isBytes32(key), `'key' expected bytes32 in hex string`)
-            return ctx.driver.getStorage(addr, key, ctx.trackedHead.id)
+            V.ensure(V.isBytes32(key),
+                `arg0 expected bytes32`)
+            return ctx.driver.getStorage(addr, key.toLowerCase(), ctx.trackedHead.id)
         },
         method: jsonABI => {
-            return newMethod(ctx, addr, jsonABI)
+            let coder
+            try {
+                coder = new abi.Function(JSON.parse(JSON.stringify(jsonABI)))
+            } catch (err) {
+                throw new V.BadParameter(`arg0 is invalid: ${err.message}`)
+            }
+            return newMethod(ctx, addr, coder)
         },
         event: jsonABI => {
-            return newEventVisitor(ctx, jsonABI, addr)
+            let coder
+            try {
+                coder = new abi.Event(JSON.parse(JSON.stringify(jsonABI)))
+            } catch (err) {
+                throw new V.BadParameter(`arg0 is invalid: ${err.message}`)
+            }
+            return newEventVisitor(ctx, addr, coder)
         }
     }
 }

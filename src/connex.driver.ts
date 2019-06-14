@@ -1,3 +1,4 @@
+/** Connex driver interface */
 declare namespace Connex {
     interface Driver {
         readonly genesis: Thor.Block
