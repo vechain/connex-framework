@@ -1,4 +1,3 @@
-
 declare namespace Connex {
     interface Driver {
         readonly genesis: Thor.Block
@@ -49,20 +48,14 @@ declare namespace Connex {
         signTx(
             msg: Vendor.SigningService.TxMessage,
             options: {
-                delegated?: boolean,
                 signer?: string,
                 gas?: number,
                 dependsOn?: string,
                 link?: string,
                 comment?: string
+                delegateHandler?: (unsignedTx: { raw: string, origin: string }) => Promise<{ signature: string }>
             }
-        ): Promise<{
-            unsignedTx?: {
-                raw: string,
-                origin: string
-            },
-            doSign(delegatorSignature?: string): Promise<Vendor.SigningService.TxResponse>
-        }>
+        ): Promise<Vendor.SigningService.TxResponse>
 
         signCert(
             msg: Vendor.SigningService.CertMessage,
