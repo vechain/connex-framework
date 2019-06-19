@@ -19,37 +19,29 @@ export function newMethod(
 
     return {
         value(val) {
-            V.ensure(typeof val === 'string' ?
-                (V.isHexString(val) || V.isDecString(val)) : (Number.isSafeInteger(val) && val >= 0),
-                'arg0 expected non-neg safe integer or hex/dec string')
-
+            V.ensureUIntNumberOrString(val, 'arg0')
             value = val
             return this
         },
         caller(caller) {
-            V.ensure(V.isAddress(caller),
-                `arg0 expected address`)
+            V.ensureAddress(caller, 'arg0')
             opts.caller = caller.toLowerCase()
             return this
         },
         gas(gas) {
-            V.ensure(gas >= 0 && Number.isSafeInteger(gas),
-                `arg0 expected non-neg safe integer`)
+            V.ensureUInt(gas, 64, 'arg0')
             opts.gas = gas
             return this
         },
         gasPrice(gp) {
-            V.ensure(V.isDecString(gp) || V.isHexString(gp),
-                `arg0 expected integer in hex/dec string`)
+            V.ensureUIntStr(gp, 'arg0')
             opts.gasPrice = gp.toLowerCase()
             return this
         },
         cache(ties: string[]) {
-            V.ensure(Array.isArray(ties),
-                `arg0 expected array`)
+            V.ensureArray(ties, 'arg0')
             cacheTies = ties.map((t, i) => {
-                V.ensure(V.isAddress(t),
-                    `arg0.#${i} expected address`)
+                V.ensureAddress(t, `arg0.#${i}`)
                 return t.toLowerCase()
             })
             return this

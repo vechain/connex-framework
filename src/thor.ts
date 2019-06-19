@@ -25,22 +25,20 @@ export function newThor(driver: Connex.Driver): Connex.Thor {
         },
         ticker: () => headTracker.ticker(),
         account: addr => {
-            V.ensure(V.isAddress(addr),
-                `arg0 expected address`)
+            V.ensureAddress(addr, 'arg0')
             return newAccountVisitor(ctx, addr.toLowerCase())
         },
         block: revision => {
             if (typeof revision === 'undefined') {
                 revision = ctx.trackedHead.id
             } else {
-                V.ensure(typeof revision === 'string' ? V.isBytes32(revision) : V.isUint32(revision),
-                    'arg0 expected bytes32 or non-neg 32-bit integer')
+                V.ensure(typeof revision === 'string' ? V.isHexBytes(revision, 32) : V.isUInt(revision, 32),
+                    'arg0 expected bytes32 or unsigned 32-bit integer')
             }
             return newBlockVisitor(ctx, typeof revision === 'string' ? revision.toLowerCase() : revision)
         },
         transaction: id => {
-            V.ensure(V.isBytes32(id),
-                `arg0 expected bytes32`)
+            V.ensureB32(id, 'arg0')
             return newTxVisitor(ctx, id.toLowerCase())
         },
         filter: kind => {

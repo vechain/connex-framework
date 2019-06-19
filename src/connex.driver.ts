@@ -54,7 +54,7 @@ declare namespace Connex {
                 dependsOn?: string,
                 link?: string,
                 comment?: string
-                delegateHandler?: (unsignedTx: { raw: string, origin: string }) => Promise<{ signature: string }>
+                delegateHandler?: Vendor.SigningService.DelegationHandler
             }
         ): Promise<Vendor.SigningService.TxResponse>
 

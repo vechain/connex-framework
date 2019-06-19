@@ -29,7 +29,7 @@ export function newEventVisitor(
             }
         },
         filter: (indexed) => {
-            V.ensure(Array.isArray(indexed), 'arg0 expected array')
+            V.ensureArray(indexed, 'arg0')
 
             if (indexed.length === 0) {
                 indexed = [{}]

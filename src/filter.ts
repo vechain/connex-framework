@@ -23,18 +23,19 @@ export function newFilter<T extends 'event' | 'transfer'>(
 
     return {
         criteria(set) {
-            V.ensure(Array.isArray(set),
-                `arg0 expected array`)
-
+            V.ensureArray(set, 'arg0')
             if (kind === 'event') {
                 filterBody.criteriaSet = (set as Connex.Thor.Event.Criteria[])
                     .map((c, i) => {
-                        V.ensure(!c.address || V.isAddress(c.address),
-                            `arg0.#${i}.address expected address`)
+                        if (c.address) {
+                            V.ensureAddress(c.address, `arg0.#${i}.address`)
+                        }
+
                         const topics: Array<keyof typeof c> = ['topic0', 'topic1', 'topic2', 'topic3', 'topic4']
                         topics.forEach(t => {
-                            V.ensure(!c[t] || V.isBytes32(c[t]!),
-                                `arg0.#${i}.${t} expected bytes32`)
+                            if (c[t]) {
+                                V.ensureB32(c[t]!, `arg0.#${i}.${t}`)
+                            }
                         })
 
                         return {
@@ -49,12 +50,16 @@ export function newFilter<T extends 'event' | 'transfer'>(
             } else {
                 filterBody.criteriaSet = (set as Connex.Thor.Transfer.Criteria[])
                     .map((c, i) => {
-                        V.ensure(!c.txOrigin || V.isAddress(c.txOrigin),
-                            `arg0.#${i}.txOrigin expected address`)
-                        V.ensure(!c.sender || V.isAddress(c.sender),
-                            `arg0.#${i}.sender expected address`)
-                        V.ensure(!c.recipient || V.isAddress(c.recipient),
-                            `arg0.#${i}.recipient expected address`)
+                        if (c.txOrigin) {
+                            V.ensureAddress(c.txOrigin, `arg0.#${i}.txOrigin`)
+                        }
+                        if (c.sender) {
+                            V.ensureAddress(c.sender, `arg0.#${i}.sender`)
+                        }
+                        if (c.recipient) {
+                            V.ensureAddress(c.recipient, `arg0.#${i}.recipient`)
+                        }
+
                         return {
                             txOrigin: c.txOrigin ? c.txOrigin.toLowerCase() : undefined,
                             sender: c.sender ? c.sender.toLowerCase() : undefined,
@@ -66,14 +71,12 @@ export function newFilter<T extends 'event' | 'transfer'>(
             return this
         },
         range(range) {
-            V.ensure(range instanceof Object,
-                `arg0 expected object`)
+            V.ensureObject(range, `arg0`)
             V.ensure(range.unit === 'block' || range.unit === 'time',
                 `arg0.unit expected 'block' or 'time'`)
-            V.ensure(range.to >= 0 && Number.isSafeInteger(range.to),
-                `arg0.to expected non-neg safe integer`)
-            V.ensure(range.from >= 0 && Number.isSafeInteger(range.from),
-                `arg0.from expected non-neg safe integer`)
+            V.ensureUInt(range.to, 64, `arg0.to`)
+            V.ensureUInt(range.from, 64, `arg0.from`)
+            V.ensure(range.from >= range.to, 'arg0.from expected >= arg0.to')
 
             filterBody.range = { ...range }
             return this
@@ -85,10 +88,9 @@ export function newFilter<T extends 'event' | 'transfer'>(
             return this
         },
         apply(offset, limit) {
-            V.ensure(offset >= 0 && Number.isSafeInteger(offset),
-                `arg0 expected non-neg safe integer`)
+            V.ensureUInt(offset, 64, `arg0`)
             V.ensure(limit >= 0 && limit <= MAX_LIMIT && Number.isInteger(limit),
-                `arg1 expected integer in [0, ${MAX_LIMIT}]`)
+                `arg1 expected unsigned integer <= ${MAX_LIMIT}`)
 
             filterBody.options.offset = offset
             filterBody.options.limit = limit

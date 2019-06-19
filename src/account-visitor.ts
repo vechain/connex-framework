@@ -16,8 +16,7 @@ export function newAccountVisitor(
             return ctx.driver.getCode(addr, ctx.trackedHead.id)
         },
         getStorage: key => {
-            V.ensure(V.isBytes32(key),
-                `arg0 expected bytes32`)
+            V.ensureB32(key, 'arg0')
             return ctx.driver.getStorage(addr, key.toLowerCase(), ctx.trackedHead.id)
         },
         method: jsonABI => {
@@ -25,7 +24,7 @@ export function newAccountVisitor(
             try {
                 coder = new abi.Function(JSON.parse(JSON.stringify(jsonABI)))
             } catch (err) {
-                throw new V.BadParameter(`arg0 is invalid: ${err.message}`)
+                throw new V.BadParameter(`arg0 expected valid ABI: ${err.message}`)
             }
             return newMethod(ctx, addr, coder)
         },
@@ -34,7 +33,7 @@ export function newAccountVisitor(
             try {
                 coder = new abi.Event(JSON.parse(JSON.stringify(jsonABI)))
             } catch (err) {
-                throw new V.BadParameter(`arg0 is invalid: ${err.message}`)
+                throw new V.BadParameter(`arg0 expected valid ABI: ${err.message}`)
             }
             return newEventVisitor(ctx, addr, coder)
         }
