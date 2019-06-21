@@ -10,32 +10,24 @@ export function newExplainer(ctx: Context): Connex.Thor.Explainer {
 
     return {
         caller(addr) {
-            V.ensureAddress(addr, 'arg0')
+            V.validate(addr, 'address', 'arg0')
             opts.caller = addr.toLowerCase()
             return this
         },
         gas(gas) {
-            V.ensureUInt(gas, 64, 'arg0')
+            V.validate(gas, 'uint64', 'arg0')
             opts.gas = gas
             return this
         },
         gasPrice(gp) {
-            V.ensureUIntStr(gp, 'arg0')
-            opts.gasPrice = gp.toLowerCase()
+            V.validate(gp, 'big_int', 'arg0')
+            opts.gasPrice = gp.toString().toLowerCase()
             return this
         },
         execute(clauses) {
-            V.ensureArray(clauses, 'arg0')
+            V.validate(clauses, [clauseScheme], 'arg0')
 
-            clauses = clauses.map((c, i) => {
-                if (c.to) {
-                    V.ensureAddress(c.to, `arg0.#${i}.to`)
-                }
-                V.ensureUIntNumberOrString(c.value, `arg0.#${i}.value`)
-                if (c.data) {
-                    V.ensureBytes(c.data, `arg0.#${i}.data`)
-                }
-
+            clauses = clauses.map(c => {
                 return {
                     to: c.to ? c.to.toLowerCase() : null,
                     value: c.value.toString().toLowerCase(),
@@ -60,4 +52,10 @@ export function newExplainer(ctx: Context): Connex.Thor.Explainer {
                 })
         }
     }
+}
+
+const clauseScheme: V.Scheme<Connex.Thor.Clause> = {
+    to: new V.Nullable('address'),
+    value: 'big_int',
+    data: new V.Optional('bytes')
 }

@@ -23,21 +23,10 @@ export function newFilter<T extends 'event' | 'transfer'>(
 
     return {
         criteria(set) {
-            V.ensureArray(set, 'arg0')
             if (kind === 'event') {
+                V.validate(set as Connex.Thor.Event.Criteria[], [eventCriteriaScheme], 'arg0')
                 filterBody.criteriaSet = (set as Connex.Thor.Event.Criteria[])
-                    .map((c, i) => {
-                        if (c.address) {
-                            V.ensureAddress(c.address, `arg0.#${i}.address`)
-                        }
-
-                        const topics: Array<keyof typeof c> = ['topic0', 'topic1', 'topic2', 'topic3', 'topic4']
-                        topics.forEach(t => {
-                            if (c[t]) {
-                                V.ensureB32(c[t]!, `arg0.#${i}.${t}`)
-                            }
-                        })
-
+                    .map(c => {
                         return {
                             address: c.address ? c.address.toLowerCase() : undefined,
                             topic0: c.topic0 ? c.topic0.toLowerCase() : undefined,
@@ -48,18 +37,9 @@ export function newFilter<T extends 'event' | 'transfer'>(
                         }
                     })
             } else {
+                V.validate(set as Connex.Thor.Transfer.Criteria[], [transferCriteriaScheme], 'arg0')
                 filterBody.criteriaSet = (set as Connex.Thor.Transfer.Criteria[])
-                    .map((c, i) => {
-                        if (c.txOrigin) {
-                            V.ensureAddress(c.txOrigin, `arg0.#${i}.txOrigin`)
-                        }
-                        if (c.sender) {
-                            V.ensureAddress(c.sender, `arg0.#${i}.sender`)
-                        }
-                        if (c.recipient) {
-                            V.ensureAddress(c.recipient, `arg0.#${i}.recipient`)
-                        }
-
+                    .map(c => {
                         return {
                             txOrigin: c.txOrigin ? c.txOrigin.toLowerCase() : undefined,
                             sender: c.sender ? c.sender.toLowerCase() : undefined,
@@ -71,11 +51,11 @@ export function newFilter<T extends 'event' | 'transfer'>(
             return this
         },
         range(range) {
-            V.ensureObject(range, `arg0`)
-            V.ensure(range.unit === 'block' || range.unit === 'time',
-                `arg0.unit expected 'block' or 'time'`)
-            V.ensureUInt(range.to, 64, `arg0.to`)
-            V.ensureUInt(range.from, 64, `arg0.from`)
+            V.validate(range, {
+                unit: v => (v === 'block' || v === 'time') ? '' : `expected 'block' or 'time'`,
+                from: 'uint64',
+                to: 'uint64'
+            }, 'arg0')
             V.ensure(range.from >= range.to, 'arg0.from expected >= arg0.to')
 
             filterBody.range = { ...range }
@@ -88,7 +68,7 @@ export function newFilter<T extends 'event' | 'transfer'>(
             return this
         },
         apply(offset, limit) {
-            V.ensureUInt(offset, 64, `arg0`)
+            V.validate(offset, 'uint64', 'arg0')
             V.ensure(limit >= 0 && limit <= MAX_LIMIT && Number.isInteger(limit),
                 `arg1 expected unsigned integer <= ${MAX_LIMIT}`)
 
@@ -102,4 +82,18 @@ export function newFilter<T extends 'event' | 'transfer'>(
             }
         }
     }
+}
+
+const eventCriteriaScheme: V.Scheme<Connex.Thor.Event.Criteria> = {
+    address: new V.Optional('address'),
+    topic0: new V.Optional('bytes32'),
+    topic1: new V.Optional('bytes32'),
+    topic2: new V.Optional('bytes32'),
+    topic3: new V.Optional('bytes32'),
+    topic4: new V.Optional('bytes32')
+}
+const transferCriteriaScheme: V.Scheme<Connex.Thor.Transfer.Criteria> = {
+    sender: new V.Optional('address'),
+    recipient: new V.Optional('address'),
+    txOrigin: new V.Optional('address')
 }

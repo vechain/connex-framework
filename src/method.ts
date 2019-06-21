@@ -19,31 +19,28 @@ export function newMethod(
 
     return {
         value(val) {
-            V.ensureUIntNumberOrString(val, 'arg0')
+            V.validate(val, 'big_int', 'arg0')
             value = val
             return this
         },
         caller(caller) {
-            V.ensureAddress(caller, 'arg0')
+            V.validate(caller, 'address', 'arg0')
             opts.caller = caller.toLowerCase()
             return this
         },
         gas(gas) {
-            V.ensureUInt(gas, 64, 'arg0')
+            V.validate(gas, 'uint64', 'arg0')
             opts.gas = gas
             return this
         },
         gasPrice(gp) {
-            V.ensureUIntStr(gp, 'arg0')
-            opts.gasPrice = gp.toLowerCase()
+            V.validate(gp, 'big_int', 'arg0')
+            opts.gasPrice = gp.toString().toLowerCase()
             return this
         },
         cache(ties: string[]) {
-            V.ensureArray(ties, 'arg0')
-            cacheTies = ties.map((t, i) => {
-                V.ensureAddress(t, `arg0.#${i}`)
-                return t.toLowerCase()
-            })
+            V.validate(ties, ['address'], 'arg0')
+            cacheTies = ties.map(t => t.toLowerCase())
             return this
         },
         asClause: (...args) => {

@@ -25,7 +25,7 @@ export function newThor(driver: Connex.Driver): Connex.Thor {
         },
         ticker: () => headTracker.ticker(),
         account: addr => {
-            V.ensureAddress(addr, 'arg0')
+            V.validate(addr, 'address', 'arg0')
             return newAccountVisitor(ctx, addr.toLowerCase())
         },
         block: revision => {
@@ -38,7 +38,7 @@ export function newThor(driver: Connex.Driver): Connex.Thor {
             return newBlockVisitor(ctx, typeof revision === 'string' ? revision.toLowerCase() : revision)
         },
         transaction: id => {
-            V.ensureB32(id, 'arg0')
+            V.validate(id, 'bytes32', 'arg0')
             return newTxVisitor(ctx, id.toLowerCase())
         },
         filter: kind => {

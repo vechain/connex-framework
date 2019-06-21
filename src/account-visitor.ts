@@ -16,7 +16,7 @@ export function newAccountVisitor(
             return ctx.driver.getCode(addr, ctx.trackedHead.id)
         },
         getStorage: key => {
-            V.ensureB32(key, 'arg0')
+            V.validate(key, 'bytes32', 'arg0')
             return ctx.driver.getStorage(addr, key.toLowerCase(), ctx.trackedHead.id)
         },
         method: jsonABI => {
