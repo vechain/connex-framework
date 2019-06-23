@@ -61,7 +61,7 @@ export function newMethod(
             const clause = this.asClause(...args)
             return ctx.driver.explain(
                 {
-                    clauses: [clause],
+                    clauses: [clause as any],
                     ...opts
                 },
                 ctx.trackedHead.id,

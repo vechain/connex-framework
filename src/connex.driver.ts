@@ -14,7 +14,11 @@ declare namespace Connex {
         getStorage(addr: string, key: string, revision: string): Promise<Thor.Storage>
         explain(
             arg: {
-                clauses: Thor.Clause[],
+                clauses: Array<{
+                    to: string | null
+                    value: string
+                    data: string
+                }>,
                 caller?: string
                 gas?: number
                 gasPrice?: string
@@ -48,7 +52,12 @@ declare namespace Connex {
         ): Promise<Thor.Transfer[]>
 
         signTx(
-            msg: Vendor.SigningService.TxMessage,
+            msg: Array<{
+                to: string | null
+                value: string
+                data: string
+                comment?: string
+            }>,
             options: {
                 signer?: string,
                 gas?: number,

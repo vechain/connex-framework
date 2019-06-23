@@ -68,7 +68,7 @@ function newTxSigningService(driver: Connex.Driver): Connex.Vendor.TxSigningServ
         },
         request(msg) {
             V.validate(msg, [clauseScheme], 'arg0')
-            msg = msg.map(c => {
+            const transformedMsg = msg.map(c => {
                 return {
                     to: c.to ? c.to.toLowerCase() : null,
                     value: c.value.toString().toLowerCase(),
@@ -79,7 +79,7 @@ function newTxSigningService(driver: Connex.Driver): Connex.Vendor.TxSigningServ
 
             return (async () => {
                 try {
-                    return await driver.signTx(msg, opts)
+                    return await driver.signTx(transformedMsg, opts)
                 } catch (err) {
                     throw new Rejected(err.message)
                 }

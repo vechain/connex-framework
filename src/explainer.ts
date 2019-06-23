@@ -27,7 +27,7 @@ export function newExplainer(ctx: Context): Connex.Thor.Explainer {
         execute(clauses) {
             V.validate(clauses, [clauseScheme], 'arg0')
 
-            clauses = clauses.map(c => {
+            const transformedClauses = clauses.map(c => {
                 return {
                     to: c.to ? c.to.toLowerCase() : null,
                     value: c.value.toString().toLowerCase(),
@@ -37,7 +37,7 @@ export function newExplainer(ctx: Context): Connex.Thor.Explainer {
 
             return ctx.driver.explain(
                 {
-                    clauses,
+                    clauses: transformedClauses,
                     ...opts
                 },
                 ctx.trackedHead.id)
