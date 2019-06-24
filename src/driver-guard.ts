@@ -81,7 +81,8 @@ const headScheme: V.Scheme<Connex.Thor.Status['head']> = {
     id: 'bytes32',
     number: 'uint32',
     timestamp: 'uint64',
-    parentID: 'bytes32'
+    parentID: 'bytes32',
+    txsFeatures: new V.Optional('uint32')
 }
 
 const blockScheme: V.Scheme<Connex.Thor.Block> = {

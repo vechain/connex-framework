@@ -21,7 +21,7 @@ export function isUInt(val: number, bit: number) {
     return bit ? val < 2 ** bit : true
 }
 
-export function isBigNumber(v: number | string) {
+export function isBigInt(v: number | string) {
     return typeof v === 'string' ?
         (isDecString(v) || isHexString(v)) :
         isUInt(v, 0)
@@ -40,7 +40,8 @@ export function ensure(b: boolean, msg: string) {
     }
 }
 
-type BaseRule = 'bytes' |
+type BaseRule =
+    'bytes' |
     'bytes8' |
     'bytes32' |
     'uint8' |
@@ -116,7 +117,7 @@ function validateBaseRule(value: any, rule: BaseRule) {
         case 'bool':
             return typeof value === 'boolean' || 'expected boolean'
         case 'big_int':
-            return isBigNumber(value) || 'expected unsigned integer in number or string'
+            return isBigInt(value) || 'expected unsigned integer in number or string'
         case 'hex_string':
             return isHexString(value) || 'expected integer in hex string'
         case 'address':
