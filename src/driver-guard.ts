@@ -1,9 +1,25 @@
 import * as V from './validator'
 
-export function newDriverGuard(driver: Connex.Driver): Connex.Driver {
-    const genesis = driver.genesis
-    test(genesis, blockScheme, 'genesis')
+export function newDriverGuard(
+    driver: Connex.Driver,
+    errHandler?: (err: Error) => void
+): Connex.Driver {
 
+    const test = <T>(obj: T, scheme: V.Scheme<T>, path: string) => {
+        try {
+            V.validate<T>(obj, scheme, path)
+        } catch (err) {
+            if (errHandler) {
+                errHandler(err)
+            } else {
+                // tslint:disable-next-line:no-console
+                console.warn(`Connex-Driver[MALFORMED RESPONSE]: ${err.message}`)
+            }
+        }
+        return obj
+    }
+
+    const genesis = test(driver.genesis, blockScheme, 'genesis')
     return {
         genesis,
         getHead() {
@@ -200,14 +216,4 @@ const vmOutputScheme: V.Scheme<Connex.Thor.VMOutput> = {
         meta: v => '',
     }],
     decoded: v => ''
-}
-
-function test<T>(obj: T, scheme: V.Scheme<T>, path: string) {
-    try {
-        V.validate<T>(obj, scheme, path)
-    } catch (err) {
-        // tslint:disable-next-line:no-console
-        console.warn(`Connex-Driver[MALFORMED RESPONSE]: ${err.message}`)
-    }
-    return obj
 }
