@@ -20,10 +20,13 @@ export function newDriverGuard(
     }
 
     const genesis = test(driver.genesis, blockScheme, 'genesis')
+    const initialHead = test(driver.initialHead, headScheme, 'initialHead')
     return {
         genesis,
+        initialHead,
         getHead() {
-            return test(driver.getHead(), headScheme, 'getHead()')
+            return driver.getHead()
+                .then(h => test(h, headScheme, 'getHead()'))
         },
         getBlock(revision) {
             return driver.getBlock(revision)

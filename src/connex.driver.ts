@@ -2,8 +2,9 @@
 declare namespace Connex {
     interface Driver {
         readonly genesis: Thor.Block
+        readonly initialHead: Thor.Status['head']
 
-        getHead(): Thor.Status['head']
+        getHead(): Promise<Thor.Status['head']>
 
         getBlock(revision: string | number): Promise<Thor.Block | null>
         getTransaction(id: string, head: string): Promise<Thor.Transaction | null>

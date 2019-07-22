@@ -1,17 +1,22 @@
 export function newHeadTracker(driver: Connex.Driver) {
-    let head = { ...driver.getHead() }
+    let head = { ...driver.initialHead }
     let resolvers: Array<() => void> = [];
 
     (async () => {
         for (; ;) {
-            const newHead = { ...driver.getHead() }
-            if (newHead.id !== head.id && newHead.number >= head.number) {
-                head = newHead
-                const resolversCopy = resolvers
-                resolvers = []
-                resolversCopy.forEach(r => r())
+            try {
+                const newHead = await driver.getHead()
+                if (newHead.id !== head.id && newHead.number >= head.number) {
+                    head = { ...newHead }
+                    const resolversCopy = resolvers
+                    resolvers = []
+                    resolversCopy.forEach(r => r())
+                } else {
+                    await new Promise(resolve => setTimeout(resolve, 1 * 1000))
+                }
+            } catch {
+                await new Promise(resolve => setTimeout(resolve, 5 * 1000))
             }
-            await new Promise(resolve => setTimeout(resolve, 1 * 1000))
         }
     })()
 
