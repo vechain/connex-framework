@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@vechain/abi": "^1.0.1",
-    "@vechain/connex": "^1.3.1"
+    "@vechain/connex": "^1.3.1",
+    "validator-ts": "^0.9.1"
   }
 }

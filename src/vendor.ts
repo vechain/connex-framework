@@ -1,4 +1,5 @@
-import * as V from './validator'
+import * as R from './rules'
+import * as V from 'validator-ts'
 
 export function newVendor(driver: Connex.Driver): Connex.Vendor {
     return {
@@ -8,12 +9,12 @@ export function newVendor(driver: Connex.Driver): Connex.Vendor {
             } else if (kind === 'cert') {
                 return newCertSigningService(driver) as any
             } else {
-                throw new V.BadParameter(`arg0 expected 'tx' or 'cert'`)
+                throw new R.BadParameter(`arg0: expected 'tx' or 'cert'`)
             }
         },
         owned: (addr) => {
-            V.validate(addr, 'address', 'arg0')
-            return driver.isAddressOwned(addr.toLowerCase())
+            addr = R.test(addr, R.address, 'arg0').toLowerCase()
+            return driver.isAddressOwned(addr)
         }
     }
 }
@@ -29,45 +30,40 @@ function newTxSigningService(driver: Connex.Driver): Connex.Vendor.TxSigningServ
     } = {}
     return {
         signer(addr) {
-            V.validate(addr, 'address', 'arg0')
-            opts.signer = addr.toLowerCase()
+            opts.signer = R.test(addr, R.address, 'arg0').toLowerCase()
             return this
         },
         gas(gas) {
-            V.validate(gas, 'uint64', 'arg0')
-            opts.gas = gas
+            opts.gas = R.test(gas, R.uint64, 'arg0')
             return this
         },
         dependsOn(txid) {
-            V.validate(txid, 'bytes32', 'arg0')
-            opts.dependsOn = txid.toLowerCase()
+            opts.dependsOn = R.test(txid, R.bytes32, 'arg0').toLowerCase()
             return this
         },
         link(url) {
-            V.validate(url, 'string', 'arg0')
-            opts.link = url
+            opts.link = R.test(url, R.string, 'arg0')
             return this
         },
         comment(text) {
-            V.validate(text, 'string', 'arg0')
-            opts.comment = text
+            opts.comment = R.test(text, R.string, 'arg0')
             return this
         },
         delegate(handler) {
-            V.ensure(typeof handler === 'function',
-                `arg0 expected function`)
+            R.ensure(typeof handler === 'function',
+                `arg0: expected function`)
 
             opts.delegateHandler = async unsigned => {
                 const obj = await handler(unsigned)
-                V.validate(obj, {
-                    signature: v => V.isHexBytes(v, 65) ? '' : 'expected 65 bytes'
-                }, 'delegation result')
+                R.test(obj, {
+                    signature: v => R.isHexBytes(v, 65) ? '' : 'expected 65 bytes'
+                }, 'delegation-result')
                 return obj
             }
             return this
         },
         request(msg) {
-            V.validate(msg, [clauseScheme], 'arg0')
+            R.test(msg, [clauseScheme], 'arg0')
             const transformedMsg = msg.map(c => {
                 return {
                     to: c.to ? c.to.toLowerCase() : null,
@@ -96,22 +92,20 @@ function newCertSigningService(driver: Connex.Driver): Connex.Vendor.CertSigning
 
     return {
         signer(addr) {
-            V.validate(addr, 'address', 'arg0')
-            opts.signer = addr.toLowerCase()
+            opts.signer = R.test(addr, R.address, 'arg0').toLowerCase()
             return this
         },
         link(url) {
-            V.validate(url, 'string', 'arg0')
-            opts.link = url
+            opts.link = R.test(url, R.string, 'arg0')
             return this
         },
         request(msg) {
-            V.validate(msg, {
+            R.test(msg, {
                 purpose: v => (v === 'agreement' || v === 'identification') ?
                     '' : `expected 'agreement' or 'identification'`,
                 payload: {
                     type: v => v === 'text' ? '' : `expected 'text'`,
-                    content: 'string'
+                    content: R.string
                 }
             }, 'arg0')
 
@@ -135,8 +129,8 @@ class Rejected extends Error {
 Rejected.prototype.name = 'Rejected'
 
 const clauseScheme: V.Scheme<Connex.Vendor.SigningService.TxMessage[number]> = {
-    to: new V.Nullable('address'),
-    value: 'big_int',
-    data: new V.Optional('bytes'),
-    comment: new V.Optional('string')
+    to: V.nullable(R.address),
+    value: R.bigInt,
+    data: V.optional(R.bytes),
+    comment: V.optional(R.string)
 }

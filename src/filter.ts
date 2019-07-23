@@ -1,4 +1,5 @@
-import * as V from './validator'
+import * as R from './rules'
+import * as V from 'validator-ts'
 
 const MAX_LIMIT = 256
 
@@ -24,7 +25,7 @@ export function newFilter<T extends 'event' | 'transfer'>(
     return {
         criteria(set) {
             if (kind === 'event') {
-                V.validate(set as Connex.Thor.Event.Criteria[], [eventCriteriaScheme], 'arg0')
+                R.test(set as Connex.Thor.Event.Criteria[], [eventCriteriaScheme], 'arg0')
                 filterBody.criteriaSet = (set as Connex.Thor.Event.Criteria[])
                     .map(c => {
                         return {
@@ -37,7 +38,7 @@ export function newFilter<T extends 'event' | 'transfer'>(
                         }
                     })
             } else {
-                V.validate(set as Connex.Thor.Transfer.Criteria[], [transferCriteriaScheme], 'arg0')
+                R.test(set as Connex.Thor.Transfer.Criteria[], [transferCriteriaScheme], 'arg0')
                 filterBody.criteriaSet = (set as Connex.Thor.Transfer.Criteria[])
                     .map(c => {
                         return {
@@ -51,26 +52,26 @@ export function newFilter<T extends 'event' | 'transfer'>(
             return this
         },
         range(range) {
-            V.validate(range, {
+            R.test(range, {
                 unit: v => (v === 'block' || v === 'time') ? '' : `expected 'block' or 'time'`,
-                from: 'uint64',
-                to: 'uint64'
+                from: R.uint64,
+                to: R.uint64
             }, 'arg0')
-            V.ensure(range.from >= range.to, 'arg0.from expected >= arg0.to')
+            R.ensure(range.from >= range.to, 'arg0.from: expected >= arg0.to')
 
             filterBody.range = { ...range }
             return this
         },
         order(order) {
-            V.ensure(order === 'asc' || order === 'desc',
-                `arg0 expected 'asc' or 'desc'`)
+            R.ensure(order === 'asc' || order === 'desc',
+                `arg0: expected 'asc' or 'desc'`)
             filterBody.order = order
             return this
         },
         apply(offset, limit) {
-            V.validate(offset, 'uint64', 'arg0')
-            V.ensure(limit >= 0 && limit <= MAX_LIMIT && Number.isInteger(limit),
-                `arg1 expected unsigned integer <= ${MAX_LIMIT}`)
+            R.test(offset, R.uint64, 'arg0')
+            R.ensure(limit >= 0 && limit <= MAX_LIMIT && Number.isInteger(limit),
+                `arg1: expected unsigned integer <= ${MAX_LIMIT}`)
 
             filterBody.options.offset = offset
             filterBody.options.limit = limit
@@ -85,15 +86,15 @@ export function newFilter<T extends 'event' | 'transfer'>(
 }
 
 const eventCriteriaScheme: V.Scheme<Connex.Thor.Event.Criteria> = {
-    address: new V.Optional('address'),
-    topic0: new V.Optional('bytes32'),
-    topic1: new V.Optional('bytes32'),
-    topic2: new V.Optional('bytes32'),
-    topic3: new V.Optional('bytes32'),
-    topic4: new V.Optional('bytes32')
+    address: V.optional(R.address),
+    topic0: V.optional(R.bytes32),
+    topic1: V.optional(R.bytes32),
+    topic2: V.optional(R.bytes32),
+    topic3: V.optional(R.bytes32),
+    topic4: V.optional(R.bytes32)
 }
 const transferCriteriaScheme: V.Scheme<Connex.Thor.Transfer.Criteria> = {
-    sender: new V.Optional('address'),
-    recipient: new V.Optional('address'),
-    txOrigin: new V.Optional('address')
+    sender: V.optional(R.address),
+    recipient: V.optional(R.address),
+    txOrigin: V.optional(R.address)
 }

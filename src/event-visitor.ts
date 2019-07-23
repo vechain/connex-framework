@@ -1,6 +1,6 @@
 import { abi } from '@vechain/abi'
 import { newFilter } from './filter'
-import * as V from './validator'
+import { BadParameter, test } from './rules'
 
 export function newEventVisitor(
     ctx: Context,
@@ -25,11 +25,11 @@ export function newEventVisitor(
             try {
                 return encode(indexed)
             } catch (err) {
-                throw new V.BadParameter(`arg0 can not be encoded: ${err.message}`)
+                throw new BadParameter(`arg0: can not be encoded (${err.message})`)
             }
         },
         filter: (indexed) => {
-            V.validate(indexed, [{}], 'arg0')
+            test(indexed, [{}], 'arg0')
 
             if (indexed.length === 0) {
                 indexed = [{}]
@@ -39,7 +39,7 @@ export function newEventVisitor(
                 try {
                     return encode(o)
                 } catch (err) {
-                    throw new V.BadParameter(`arg0.#${i} can not be encoded: ${err.message}`)
+                    throw new BadParameter(`arg0.#${i}: can not be encoded (${err.message})`)
                 }
             })
             const filter = newFilter(ctx, 'event').criteria(criteriaSet)

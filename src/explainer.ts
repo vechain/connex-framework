@@ -1,5 +1,6 @@
-import * as V from './validator'
 import { decodeRevertReason } from './revert-reason'
+import * as R from './rules'
+import * as V from 'validator-ts'
 
 export function newExplainer(ctx: Context): Connex.Thor.Explainer {
     const opts: {
@@ -10,22 +11,19 @@ export function newExplainer(ctx: Context): Connex.Thor.Explainer {
 
     return {
         caller(addr) {
-            V.validate(addr, 'address', 'arg0')
-            opts.caller = addr.toLowerCase()
+            opts.caller = R.test(addr, R.address, 'arg0').toLowerCase()
             return this
         },
         gas(gas) {
-            V.validate(gas, 'uint64', 'arg0')
-            opts.gas = gas
+            opts.gas = R.test(gas, R.uint64, 'arg0')
             return this
         },
         gasPrice(gp) {
-            V.validate(gp, 'big_int', 'arg0')
-            opts.gasPrice = gp.toString().toLowerCase()
+            opts.gasPrice = R.test(gp, R.bigInt, 'arg0').toString().toLowerCase()
             return this
         },
         execute(clauses) {
-            V.validate(clauses, [clauseScheme], 'arg0')
+            R.test(clauses, [clauseScheme], 'arg0')
 
             const transformedClauses = clauses.map(c => {
                 return {
@@ -55,7 +53,7 @@ export function newExplainer(ctx: Context): Connex.Thor.Explainer {
 }
 
 const clauseScheme: V.Scheme<Connex.Thor.Clause> = {
-    to: new V.Nullable('address'),
-    value: 'big_int',
-    data: new V.Optional('bytes')
+    to: V.nullable(R.address),
+    value: R.bigInt,
+    data: V.optional(R.bytes)
 }

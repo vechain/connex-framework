@@ -1,6 +1,6 @@
 import { abi } from '@vechain/abi'
-import * as V from './validator'
 import { decodeRevertReason } from './revert-reason'
+import * as R from './rules'
 
 export function newMethod(
     ctx: Context,
@@ -19,33 +19,28 @@ export function newMethod(
 
     return {
         value(val) {
-            V.validate(val, 'big_int', 'arg0')
-            value = val
+            value = R.test(val, R.bigInt, 'arg0')
             return this
         },
         caller(caller) {
-            V.validate(caller, 'address', 'arg0')
-            opts.caller = caller.toLowerCase()
+            opts.caller = R.test(caller, R.address, 'arg0').toLowerCase()
             return this
         },
         gas(gas) {
-            V.validate(gas, 'uint64', 'arg0')
-            opts.gas = gas
+            opts.gas = R.test(gas, R.uint64, 'arg0')
             return this
         },
         gasPrice(gp) {
-            V.validate(gp, 'big_int', 'arg0')
-            opts.gasPrice = gp.toString().toLowerCase()
+            opts.gasPrice = R.test(gp, R.bigInt, 'arg0').toString().toLowerCase()
             return this
         },
         cache(ties: string[]) {
-            V.validate(ties, ['address'], 'arg0')
-            cacheTies = ties.map(t => t.toLowerCase())
+            cacheTies = R.test(ties, [R.address], 'arg0').map(t => t.toLowerCase())
             return this
         },
         asClause: (...args) => {
             const inputsLen = (coder.definition.inputs || []).length
-            V.ensure(inputsLen === args.length, `args count expected ${inputsLen}`)
+            R.ensure(inputsLen === args.length, `args count expected ${inputsLen}`)
             try {
                 const data = coder.encode(...args)
                 return {
@@ -54,7 +49,7 @@ export function newMethod(
                     data
                 }
             } catch (err) {
-                throw new V.BadParameter(`args can not be encoded: ${err.message}`)
+                throw new R.BadParameter(`args can not be encoded (${err.message})`)
             }
         },
         call(...args) {

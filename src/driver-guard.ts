@@ -1,4 +1,5 @@
-import * as V from './validator'
+import * as V from 'validator-ts'
+import * as R from './rules'
 
 export function newDriverGuard(
     driver: Connex.Driver,
@@ -7,7 +8,7 @@ export function newDriverGuard(
 
     const test = <T>(obj: T, scheme: V.Scheme<T>, path: string) => {
         try {
-            V.validate<T>(obj, scheme, path)
+            V.validate(obj, scheme, path)
         } catch (err) {
             if (errHandler) {
                 errHandler(err)
@@ -43,22 +44,22 @@ export function newDriverGuard(
         getAccount(addr: string, revision: string): Promise<Connex.Thor.Account> {
             return driver.getAccount(addr, revision)
                 .then(a => test(a, {
-                    balance: 'hex_string',
-                    energy: 'hex_string',
-                    hasCode: 'bool'
+                    balance: R.hexString,
+                    energy: R.hexString,
+                    hasCode: R.bool
                 }, 'getAccount()'))
         },
         getCode(addr: string, revision: string): Promise<Connex.Thor.Code> {
             return driver.getCode(addr, revision)
                 .then(c => test(c, {
-                    code: 'bytes'
+                    code: R.bytes
                 }, 'getCode()'))
         },
         getStorage(addr: string, key: string, revision: string) {
             return driver.getStorage(addr, key, revision)
                 .then(s => test(s, {
-                    value: 'bytes32'
-                }, 'getStorage'))
+                    value: R.bytes32
+                }, 'getStorage()'))
         },
         explain(arg, revision) {
             return driver.explain(arg, revision)
@@ -75,93 +76,93 @@ export function newDriverGuard(
         signTx(msg, options) {
             return driver.signTx(msg, options)
                 .then(r => test(r, {
-                    txid: 'bytes32',
-                    signer: 'address'
+                    txid: R.bytes32,
+                    signer: R.address
                 }, 'signTx()'))
         },
         signCert(msg, options) {
             return driver.signCert(msg, options)
                 .then(r => test(r, {
                     annex: {
-                        domain: 'string',
-                        timestamp: 'uint64',
-                        signer: 'address'
+                        domain: R.string,
+                        timestamp: R.uint64,
+                        signer: R.address
                     },
-                    signature: v => V.isHexBytes(v, 65) ? '' : 'expected 65 bytes'
+                    signature: v => R.isHexBytes(v, 65) ? '' : 'expected 65 bytes'
                 }, 'signCert()'))
         },
         isAddressOwned(addr) {
-            return test(driver.isAddressOwned(addr), 'bool', 'isAddressOwned()')
+            return test(driver.isAddressOwned(addr), R.bool, 'isAddressOwned()')
         }
     }
 }
 
 const headScheme: V.Scheme<Connex.Thor.Status['head']> = {
-    id: 'bytes32',
-    number: 'uint32',
-    timestamp: 'uint64',
-    parentID: 'bytes32',
-    txsFeatures: new V.Optional('uint32')
+    id: R.bytes32,
+    number: R.uint32,
+    timestamp: R.uint64,
+    parentID: R.bytes32,
+    txsFeatures: V.optional(R.uint32)
 }
 
 const blockScheme: V.Scheme<Connex.Thor.Block> = {
-    id: 'bytes32',
-    number: 'uint32',
-    size: 'uint32',
-    parentID: 'bytes32',
-    timestamp: 'uint64',
-    gasLimit: 'uint64',
-    beneficiary: 'address',
-    gasUsed: 'uint64',
-    totalScore: 'uint64',
-    txsRoot: 'bytes32',
-    txsFeatures: new V.Optional('uint32'),
-    stateRoot: 'bytes32',
-    receiptsRoot: 'bytes32',
-    signer: 'address',
-    isTrunk: 'bool',
-    transactions: ['bytes32']
+    id: R.bytes32,
+    number: R.uint32,
+    size: R.uint32,
+    parentID: R.bytes32,
+    timestamp: R.uint64,
+    gasLimit: R.uint64,
+    beneficiary: R.address,
+    gasUsed: R.uint64,
+    totalScore: R.uint64,
+    txsRoot: R.bytes32,
+    txsFeatures: V.optional(R.uint32),
+    stateRoot: R.bytes32,
+    receiptsRoot: R.bytes32,
+    signer: R.address,
+    isTrunk: R.bool,
+    transactions: [R.bytes32]
 }
 
 const txScheme: V.Scheme<Connex.Thor.Transaction> = {
-    id: 'bytes32',
-    chainTag: 'uint8',
-    blockRef: 'bytes8',
-    expiration: 'uint32',
-    gasPriceCoef: 'uint8',
-    gas: 'uint64',
-    origin: 'address',
-    delegator: new V.Optional('address'),
-    nonce: 'hex_string',
-    dependsOn: new V.Nullable('bytes32'),
-    size: 'uint32',
+    id: R.bytes32,
+    chainTag: R.uint8,
+    blockRef: R.bytes8,
+    expiration: R.uint32,
+    gasPriceCoef: R.uint8,
+    gas: R.uint64,
+    origin: R.address,
+    delegator: V.optional(R.address),
+    nonce: R.hexString,
+    dependsOn: V.nullable(R.bytes32),
+    size: R.uint32,
     clauses: [{
-        to: new V.Nullable('address'),
-        value: 'hex_string',
-        data: 'bytes'
+        to: V.nullable(R.address),
+        value: R.hexString,
+        data: R.bytes
     }],
     meta: {
-        blockID: 'bytes32',
-        blockNumber: 'uint32',
-        blockTimestamp: 'uint64'
+        blockID: R.bytes32,
+        blockNumber: R.uint32,
+        blockTimestamp: R.uint64
     }
 }
 
 const logMetaScheme: V.Scheme<Connex.Thor.LogMeta> = {
-    blockID: 'bytes32',
-    blockNumber: 'uint32',
-    blockTimestamp: 'uint64',
-    txID: 'bytes32',
-    txOrigin: 'address',
-    clauseIndex: 'uint32'
+    blockID: R.bytes32,
+    blockNumber: R.uint32,
+    blockTimestamp: R.uint64,
+    txID: R.bytes32,
+    txOrigin: R.address,
+    clauseIndex: R.uint32
 }
 
 const eventScheme: V.Scheme<Connex.Thor.Event> = {
-    address: 'address',
-    topics: ['bytes32'],
-    data: 'bytes',
-    meta: v => '',
-    decoded: v => ''
+    address: R.address,
+    topics: [R.bytes32],
+    data: R.bytes,
+    meta: () => '',
+    decoded: () => ''
 }
 const eventWithMetaScheme: V.Scheme<Connex.Thor.Event> = {
     ...eventScheme,
@@ -169,10 +170,10 @@ const eventWithMetaScheme: V.Scheme<Connex.Thor.Event> = {
 }
 
 const transferScheme: V.Scheme<Connex.Thor.Transfer> = {
-    sender: 'address',
-    recipient: 'address',
-    amount: 'hex_string',
-    meta: v => '',
+    sender: R.address,
+    recipient: R.address,
+    amount: R.hexString,
+    meta: () => '',
 }
 
 const transferWithMetaScheme: V.Scheme<Connex.Thor.Transfer> = {
@@ -181,42 +182,42 @@ const transferWithMetaScheme: V.Scheme<Connex.Thor.Transfer> = {
 }
 
 const receiptScheme: V.Scheme<Connex.Thor.Receipt> = {
-    gasUsed: 'uint64',
-    gasPayer: 'address',
-    paid: 'hex_string',
-    reward: 'hex_string',
-    reverted: 'bool',
+    gasUsed: R.uint64,
+    gasPayer: R.address,
+    paid: R.hexString,
+    reward: R.hexString,
+    reverted: R.bool,
     outputs: [{
-        contractAddress: new V.Nullable('address'),
+        contractAddress: V.nullable(R.address),
         events: [eventScheme],
         transfers: [transferScheme]
     }],
     meta: {
-        blockID: 'bytes32',
-        blockNumber: 'uint32',
-        blockTimestamp: 'uint64',
-        txID: 'bytes32',
-        txOrigin: 'address'
+        blockID: R.bytes32,
+        blockNumber: R.uint32,
+        blockTimestamp: R.uint64,
+        txID: R.bytes32,
+        txOrigin: R.address
     }
 }
 
 const vmOutputScheme: V.Scheme<Connex.Thor.VMOutput> = {
-    data: 'bytes',
-    vmError: 'string',
-    gasUsed: 'uint64',
-    reverted: 'bool',
+    data: R.bytes,
+    vmError: R.string,
+    gasUsed: R.uint64,
+    reverted: R.bool,
     events: [{
-        address: 'address',
-        topics: ['bytes32'],
-        data: 'bytes',
-        meta: v => '',
-        decoded: v => ''
+        address: R.address,
+        topics: [R.bytes32],
+        data: R.bytes,
+        meta: () => '',
+        decoded: () => ''
     }],
     transfers: [{
-        sender: 'address',
-        recipient: 'address',
-        amount: 'hex_string',
-        meta: v => '',
+        sender: R.address,
+        recipient: R.address,
+        amount: R.hexString,
+        meta: () => '',
     }],
-    decoded: v => ''
+    decoded: () => ''
 }
