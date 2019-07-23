@@ -57,7 +57,7 @@ export function newFilter<T extends 'event' | 'transfer'>(
                 from: R.uint64,
                 to: R.uint64
             }, 'arg0')
-            R.ensure(range.from >= range.to, 'arg0.from: expected >= arg0.to')
+            R.ensure(range.from <= range.to, 'arg0.from: expected >= arg0.to')
 
             filterBody.range = { ...range }
             return this
