@@ -15,7 +15,8 @@ export function newHeadTracker(driver: Connex.Driver) {
                     await new Promise(resolve => setTimeout(resolve, 1 * 1000))
                 }
             } catch {
-                await new Promise(resolve => setTimeout(resolve, 5 * 1000))
+                // rejection from driver.getHead means driver closed
+                break
             }
         }
     })()

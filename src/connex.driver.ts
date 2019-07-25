@@ -4,6 +4,7 @@ declare namespace Connex {
         readonly genesis: Thor.Block
         readonly initialHead: Thor.Status['head']
 
+        // rejected only when driver closed
         getHead(): Promise<Thor.Status['head']>
 
         getBlock(revision: string | number): Promise<Thor.Block | null>
