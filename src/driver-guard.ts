@@ -132,7 +132,7 @@ const txScheme: V.Scheme<Connex.Thor.Transaction> = {
     gasPriceCoef: R.uint8,
     gas: R.uint64,
     origin: R.address,
-    delegator: V.optional(R.address),
+    delegator: V.nullable(V.optional(R.address)),
     nonce: R.hexString,
     dependsOn: V.nullable(R.bytes32),
     size: R.uint32,
