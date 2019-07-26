@@ -23,8 +23,9 @@ const loadConnex = async () => {
 
     const driver = await Driver.connect(new SimpleNet('https://sync-testnet.vechain.org/'), wallet)
 
-    global.connex = new Framework(Framework.guardDriver(driver))
-    return
+    global.connex = new Framework(Framework.guardDriver(driver, err => {
+        it('driver guard should not emit error', done => done(err))
+    }))
 }
 
 before(() => {
