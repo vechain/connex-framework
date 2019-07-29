@@ -33,7 +33,7 @@ declare namespace Connex {
             arg: {
                 range: Thor.Filter.Range
                 options: {
-                    offset: number,
+                    offset: number
                     limit: number
                 }
                 criteriaSet: Thor.Event.Criteria[]
@@ -43,40 +43,47 @@ declare namespace Connex {
 
         filterTransferLogs(
             arg: {
-                range: Thor.Filter.Range,
+                range: Thor.Filter.Range
                 options: {
-                    offset: number,
+                    offset: number
                     limit: number
                 }
-                criteriaSet: Thor.Transfer.Criteria[],
+                criteriaSet: Thor.Transfer.Criteria[]
                 order: 'asc' | 'desc'
             }
         ): Promise<Thor.Transfer[]>
 
-        signTx(
+        buildTx(
             msg: Array<{
                 to: string | null
                 value: string
                 data: string
                 comment?: string
+                abi?: object
             }>,
             options: {
-                signer?: string,
-                gas?: number,
-                dependsOn?: string,
-                link?: string,
+                signer?: string
+                gas?: number
+                dependsOn?: string
+                link?: string
                 comment?: string
-                delegateHandler?: Vendor.SigningService.DelegationHandler
             }
-        ): Promise<Vendor.SigningService.TxResponse>
+        ): Promise<{
+            origin: string
+            raw: string // delegable raw tx, with vip-191 feature bit set
+            sign(delegation?: {
+                signature?: string
+                error?: Error
+            }): Promise<Vendor.TxResponse>
+        }>
 
         signCert(
-            msg: Vendor.SigningService.CertMessage,
+            msg: Vendor.CertMessage,
             options: {
                 signer?: string
                 link?: string
             }
-        ): Promise<Vendor.SigningService.CertResponse>
+        ): Promise<Vendor.CertResponse>
 
         isAddressOwned(addr: string): boolean
     }

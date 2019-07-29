@@ -26,8 +26,8 @@ function newTxSigningService(driver: Connex.Driver): Connex.Vendor.TxSigningServ
         dependsOn?: string
         link?: string
         comment?: string
-        delegateHandler?: Connex.Vendor.SigningService.DelegationHandler
     } = {}
+    let delegateHandler: Connex.Vendor.DelegationHandler | undefined
     return {
         signer(addr) {
             opts.signer = R.test(addr, R.address, 'arg0').toLowerCase()
@@ -53,7 +53,7 @@ function newTxSigningService(driver: Connex.Driver): Connex.Vendor.TxSigningServ
             R.ensure(typeof handler === 'function',
                 `arg0: expected function`)
 
-            opts.delegateHandler = async unsigned => {
+            delegateHandler = async unsigned => {
                 const obj = await handler(unsigned)
                 R.test(obj, {
                     signature: v => R.isHexBytes(v, 65) ? '' : 'expected 65 bytes'
@@ -69,13 +69,27 @@ function newTxSigningService(driver: Connex.Driver): Connex.Vendor.TxSigningServ
                     to: c.to ? c.to.toLowerCase() : null,
                     value: c.value.toString().toLowerCase(),
                     data: (c.data || '0x').toLowerCase(),
-                    comment: c.comment
+                    comment: c.comment,
+                    abi: JSON.parse(JSON.stringify(c.abi))
                 }
             })
 
             return (async () => {
                 try {
-                    return await driver.signTx(transformedMsg, opts)
+                    const tx = await driver.buildTx(transformedMsg, opts)
+                    let delegation: { signature?: string, error?: Error } | undefined
+                    if (delegateHandler) {
+                        try {
+                            const dSig = await delegateHandler({
+                                raw: tx.raw,
+                                origin: tx.origin
+                            })
+                            delegation = { signature: dSig.signature }
+                        } catch (err) {
+                            delegation = { error: err }
+                        }
+                    }
+                    return await tx.sign(delegation)
                 } catch (err) {
                     throw new Rejected(err.message)
                 }
@@ -128,9 +142,10 @@ class Rejected extends Error {
 
 Rejected.prototype.name = 'Rejected'
 
-const clauseScheme: V.Scheme<Connex.Vendor.SigningService.TxMessage[number]> = {
+const clauseScheme: V.Scheme<Connex.Vendor.TxMessage[number]> = {
     to: V.nullable(R.address),
     value: R.bigInt,
     data: V.optional(R.bytes),
-    comment: V.optional(R.string)
+    comment: V.optional(R.string),
+    abi: V.optional(v => v instanceof Object ? '' : 'expected object')
 }
