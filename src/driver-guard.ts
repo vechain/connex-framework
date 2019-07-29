@@ -75,18 +75,20 @@ export function newDriverGuard(
         },
         buildTx(msg, options) {
             return driver.buildTx(msg, options)
-                .then(r => {
-                    test(r, {
+                .then(tx => {
+                    test(tx, {
                         origin: R.address,
                         raw: R.bytes,
                         sign: f => typeof f === 'function' ? '' : 'expected function'
                     }, 'buildTx()')
-                    r.sign = dSig => r.sign(dSig).then(resp =>
+                    // wrap tx.sign to check its return value
+                    const sign = tx.sign.bind(tx)
+                    tx.sign = dSig => sign(dSig).then(resp =>
                         test(resp, {
                             txid: R.bytes32,
                             signer: R.address
                         }, 'buildTx()...sign()'))
-                    return r
+                    return tx
                 })
         },
         signCert(msg, options) {
