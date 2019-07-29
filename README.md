@@ -33,3 +33,6 @@ const framework = new Framework(driver)
 ### Driver implementations:
 
 * NodeJS - [connex.driver-nodejs](https://github.com/vechain/connex.driver-nodejs)
+
+### Connex playground
+* [connex repl](https://github.com/vechain/connex-repl)
