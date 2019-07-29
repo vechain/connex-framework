@@ -16,7 +16,7 @@ export function newThor(driver: Connex.Driver): Connex.Thor {
 
     const genesis = JSON.parse(JSON.stringify(driver.genesis))
     return {
-        genesis,
+        get genesis() { return genesis },
         get status() {
             return {
                 head: headTracker.head,
