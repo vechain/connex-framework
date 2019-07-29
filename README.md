@@ -22,10 +22,11 @@ class MyDriver implemented Connex.Driver {
 let driver = new MyDriver()
 
 // it's suggested in development mode, which is helpful to diagnose driver implementation.
-driver = Framework.guardDriver(driver)
+// const framework = new Framework(Framework.guardDriver(driver))
 
 const framework = new Framework(driver)
-// here `framework` is the Connex instance object
+
+// here `framework` is the ready-to-use Connex instance object
 ```
 
 ## See also
