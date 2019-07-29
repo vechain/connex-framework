@@ -70,7 +70,7 @@ function newTxSigningService(driver: Connex.Driver): Connex.Vendor.TxSigningServ
                     value: c.value.toString().toLowerCase(),
                     data: (c.data || '0x').toLowerCase(),
                     comment: c.comment,
-                    abi: JSON.parse(JSON.stringify(c.abi))
+                    abi: c.abi ? JSON.parse(JSON.stringify(c.abi)) : c.abi
                 }
             })
 
