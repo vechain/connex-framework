@@ -1,11 +1,11 @@
 export function newHeadTracker(driver: Connex.Driver) {
-    let head = { ...driver.initialHead }
+    let head = { ...driver.head }
     let resolvers: Array<() => void> = [];
 
     (async () => {
         for (; ;) {
             try {
-                const newHead = await driver.getHead()
+                const newHead = await driver.pollHead()
                 if (newHead.id !== head.id && newHead.number >= head.number) {
                     head = { ...newHead }
                     const resolversCopy = resolvers
