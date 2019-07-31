@@ -11,15 +11,17 @@ It helps various wallet instances offer consistent Connex interface to VeChain D
 npm i @vechain/connex-framework
 ```
 
-To create framework instance, the driver needs to be implemented
+To create framework instance, Connex.Driver needs to be implemented
 
 ```typescript
 import { Framework } from '@vechain/connex-framework'
+import '@vechain/connex.driver'
+
 class MyDriver implemented Connex.Driver {
     // implementations
 }
 
-let driver = new MyDriver()
+const driver = new MyDriver()
 
 // it's suggested in development mode, which is helpful to diagnose driver implementation.
 // const framework = new Framework(Framework.guardDriver(driver))
@@ -36,4 +38,5 @@ const framework = new Framework(driver)
 * NodeJS - [connex.driver-nodejs](https://github.com/vechain/connex.driver-nodejs)
 
 ### Connex playground
+
 * [connex repl](https://github.com/vechain/connex-repl)
