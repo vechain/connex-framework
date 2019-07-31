@@ -6,7 +6,7 @@ export function newTxVisitor(
         get id() {
             return id
         },
-        get: () => ctx.driver.getTransaction(id, ctx.trackedHead.id),
-        getReceipt: () => ctx.driver.getReceipt(id, ctx.trackedHead.id)
+        get: () => ctx.driver.getTransaction(id),
+        getReceipt: () => ctx.driver.getReceipt(id)
     }
 }

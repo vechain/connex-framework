@@ -34,12 +34,12 @@ export function newDriverGuard(
             return driver.getBlock(revision)
                 .then(b => b ? test(b, blockScheme, 'getBlock()') : b)
         },
-        getTransaction(id, head) {
-            return driver.getTransaction(id, head)
+        getTransaction(id) {
+            return driver.getTransaction(id)
                 .then(tx => tx ? test(tx, txScheme, 'getTransaction()') : tx)
         },
-        getReceipt(id, head) {
-            return driver.getReceipt(id, head)
+        getReceipt(id) {
+            return driver.getReceipt(id)
                 .then(r => r ? test(r, receiptScheme, 'getReceipt()') : r)
         },
         getAccount(addr: string, revision: string): Promise<Connex.Thor.Account> {

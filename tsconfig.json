@@ -8,9 +8,10 @@
       "declaration": true,
       "moduleResolution": "node",
       "allowSyntheticDefaultImports": true,
-      "resolveJsonModule": true
+      "resolveJsonModule": true,
+      "types": ["@vechain/connex", "@vechain/connex.driver"]
     },
     "include": [
       "./src"
     ]
-  }
+}

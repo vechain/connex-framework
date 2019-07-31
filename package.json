@@ -33,6 +33,7 @@
   "dependencies": {
     "@vechain/abi": "^1.0.1",
     "@vechain/connex": "^1.3.2",
+    "@vechain/connex.driver": "^1.0.0-beta-9",
     "validator-ts": "^0.9.1"
   }
 }

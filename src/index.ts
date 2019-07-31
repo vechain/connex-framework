@@ -1,5 +1,3 @@
-import '@vechain/connex'
-import './connex.driver'
 import { newThor } from './thor'
 import { newVendor } from './vendor'
 import { version as connexVersion } from '@vechain/connex/package.json'
