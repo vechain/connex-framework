@@ -1,5 +1,6 @@
 import * as R from './rules'
 import * as V from 'validator-ts'
+import { abi } from 'thor-devkit/dist/abi'
 
 export function newVendor(driver: Connex.Driver): Connex.Vendor {
     return {
@@ -147,5 +148,16 @@ const clauseScheme: V.Scheme<Connex.Vendor.TxMessage[number]> = {
     value: R.bigInt,
     data: V.optional(R.bytes),
     comment: V.optional(R.string),
-    abi: V.optional(v => v instanceof Object ? '' : 'expected object')
+    abi: V.optional(v => {
+        if (!(v instanceof Object)) {
+            return 'expected object'
+        }
+        try {
+            // tslint:disable-next-line: no-unused-expression
+            new abi.Function(v as any)
+            return ''
+        } catch (err) {
+            return `expected valid ABI (${err.message})`
+        }
+    })
 }

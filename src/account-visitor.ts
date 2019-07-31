@@ -1,6 +1,6 @@
 import { newEventVisitor } from './event-visitor'
 import { newMethod } from './method'
-import { abi } from '@vechain/abi'
+import { abi } from 'thor-devkit/dist/abi'
 import * as R from './rules'
 
 export function newAccountVisitor(

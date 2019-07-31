@@ -1,4 +1,4 @@
-import { abi } from '@vechain/abi'
+import { abi } from 'thor-devkit/dist/abi'
 import { newFilter } from './filter'
 import { BadParameter, test } from './rules'
 

@@ -1,4 +1,4 @@
-import { abi } from '@vechain/abi'
+import { abi } from 'thor-devkit/dist/abi'
 import { decodeRevertReason } from './revert-reason'
 import * as R from './rules'
 

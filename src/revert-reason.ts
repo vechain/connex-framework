@@ -1,4 +1,4 @@
-import { abi } from '@vechain/abi'
+import { abi } from 'thor-devkit/dist/abi'
 
 // https://solidity.readthedocs.io/en/v0.5.5/control-structures.html#error-handling-assert-require-revert-and-exceptions
 // 0x08c379a0
