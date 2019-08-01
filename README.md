@@ -17,7 +17,7 @@ To create framework instance, Connex.Driver needs to be implemented
 import { Framework } from '@vechain/connex-framework'
 import '@vechain/connex.driver'
 
-class MyDriver implemented Connex.Driver {
+class MyDriver implements Connex.Driver {
     // implementations
 }
 
