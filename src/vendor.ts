@@ -60,7 +60,9 @@ function newTxSigningService(driver: Connex.Driver): Connex.Vendor.TxSigningServ
                 R.test(obj, {
                     signature: v => R.isHexBytes(v, 65) ? '' : 'expected 65 bytes'
                 }, 'delegation-result')
-                return obj
+                return {
+                    signature: obj.signature.toLowerCase()
+                }
             }
             return this
         },

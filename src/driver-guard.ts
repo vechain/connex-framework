@@ -75,7 +75,17 @@ export function newDriverGuard(
                 .then(r => test(r, [transferWithMetaScheme], 'filterTransferLogs()'))
         },
         signTx(msg, option) {
-            return driver.signTx(msg, option)
+            return driver.signTx(msg, {
+                ...option,
+                delegationHandler: option.delegationHandler ?
+                    unsigned => {
+                        test(unsigned, {
+                            raw: R.bytes,
+                            origin: R.address
+                        }, 'delegationHandler.arg')
+                        return option.delegationHandler!(unsigned)
+                    } : undefined
+            })
                 .then(r => test(r, {
                     txid: R.bytes32,
                     signer: R.address
