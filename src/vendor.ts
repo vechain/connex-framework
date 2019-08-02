@@ -27,8 +27,9 @@ function newTxSigningService(driver: Connex.Driver): Connex.Vendor.TxSigningServ
         dependsOn?: string
         link?: string
         comment?: string
+        delegateHandler?: Connex.Vendor.DelegationHandler
     } = {}
-    let delegateHandler: Connex.Vendor.DelegationHandler | undefined
+
     return {
         signer(addr) {
             opts.signer = R.test(addr, R.address, 'arg0').toLowerCase()
@@ -54,7 +55,7 @@ function newTxSigningService(driver: Connex.Driver): Connex.Vendor.TxSigningServ
             R.ensure(typeof handler === 'function',
                 `arg0: expected function`)
 
-            delegateHandler = async unsigned => {
+            opts.delegateHandler = async unsigned => {
                 const obj = await handler(unsigned)
                 R.test(obj, {
                     signature: v => R.isHexBytes(v, 65) ? '' : 'expected 65 bytes'
@@ -65,32 +66,16 @@ function newTxSigningService(driver: Connex.Driver): Connex.Vendor.TxSigningServ
         },
         request(msg) {
             R.test(msg, [clauseScheme], 'arg0')
-            const transformedMsg = msg.map(c => {
-                return {
-                    to: c.to ? c.to.toLowerCase() : null,
-                    value: c.value.toString().toLowerCase(),
-                    data: (c.data || '0x').toLowerCase(),
-                    comment: c.comment,
-                    abi: c.abi ? JSON.parse(JSON.stringify(c.abi)) : c.abi
-                }
-            })
-
+            const transformedMsg = msg.map(c => ({
+                to: c.to ? c.to.toLowerCase() : null,
+                value: c.value.toString().toLowerCase(),
+                data: (c.data || '0x').toLowerCase(),
+                comment: c.comment,
+                abi: c.abi ? JSON.parse(JSON.stringify(c.abi)) : c.abi
+            }))
             return (async () => {
                 try {
-                    const tx = await driver.buildTx(transformedMsg, opts)
-                    let delegation: { signature?: string, error?: Error } | undefined
-                    if (delegateHandler) {
-                        try {
-                            const dSig = await delegateHandler({
-                                raw: tx.raw,
-                                origin: tx.origin
-                            })
-                            delegation = { signature: dSig.signature }
-                        } catch (err) {
-                            delegation = { error: err }
-                        }
-                    }
-                    return await tx.sign(delegation)
+                    return await driver.signTx(transformedMsg, opts)
                 } catch (err) {
                     throw new Rejected(err.message)
                 }

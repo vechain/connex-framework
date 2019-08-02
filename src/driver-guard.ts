@@ -74,26 +74,15 @@ export function newDriverGuard(
             return driver.filterTransferLogs(arg)
                 .then(r => test(r, [transferWithMetaScheme], 'filterTransferLogs()'))
         },
-        buildTx(msg, options) {
-            return driver.buildTx(msg, options)
-                .then(tx => {
-                    test(tx, {
-                        origin: R.address,
-                        raw: R.bytes,
-                        sign: f => typeof f === 'function' ? '' : 'expected function'
-                    }, 'buildTx()')
-                    // wrap tx.sign to check its return value
-                    const sign = tx.sign.bind(tx)
-                    tx.sign = dSig => sign(dSig).then(resp =>
-                        test(resp, {
-                            txid: R.bytes32,
-                            signer: R.address
-                        }, 'buildTx()...sign()'))
-                    return tx
-                })
+        signTx(msg, option) {
+            return driver.signTx(msg, option)
+                .then(r => test(r, {
+                    txid: R.bytes32,
+                    signer: R.address
+                }, 'signTx()'))
         },
-        signCert(msg, options) {
-            return driver.signCert(msg, options)
+        signCert(msg, option) {
+            return driver.signCert(msg, option)
                 .then(r => test(r, {
                     annex: {
                         domain: R.string,
