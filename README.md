@@ -11,6 +11,8 @@ It helps various wallet instances offer consistent Connex interface to VeChain D
 npm i @vechain/connex-framework
 ```
 
+## Usage
+
 To create framework instance, Connex.Driver needs to be implemented
 
 ```typescript
