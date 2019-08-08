@@ -21,14 +21,7 @@ export function newVendor(driver: Connex.Driver): Connex.Vendor {
 }
 
 function newTxSigningService(driver: Connex.Driver): Connex.Vendor.TxSigningService {
-    const opts: {
-        signer?: string
-        gas?: number
-        dependsOn?: string
-        link?: string
-        comment?: string
-        delegateHandler?: Connex.Vendor.DelegationHandler
-    } = {}
+    const opts: Connex.Driver.SignTxOption = {}
 
     return {
         signer(addr) {
@@ -55,7 +48,7 @@ function newTxSigningService(driver: Connex.Driver): Connex.Vendor.TxSigningServ
             R.ensure(typeof handler === 'function',
                 `arg0: expected function`)
 
-            opts.delegateHandler = async unsigned => {
+            opts.delegationHandler = async unsigned => {
                 const obj = await handler(unsigned)
                 R.test(obj, {
                     signature: v => R.isHexBytes(v, 65) ? '' : 'expected 65 bytes'
@@ -87,10 +80,7 @@ function newTxSigningService(driver: Connex.Driver): Connex.Vendor.TxSigningServ
 }
 
 function newCertSigningService(driver: Connex.Driver): Connex.Vendor.CertSigningService {
-    const opts: {
-        signer?: string
-        link?: string
-    } = {}
+    const opts: Connex.Driver.SignCertOption = {}
 
     return {
         signer(addr) {
