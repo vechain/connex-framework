@@ -103,7 +103,8 @@ export function newDriverGuard(
                 }, 'signCert()'))
         },
         isAddressOwned(addr) {
-            return test(driver.isAddressOwned(addr), R.bool, 'isAddressOwned()')
+            return driver.isAddressOwned(addr)
+                .then(r => test(r, R.bool, 'isAddressOwned()'))
         }
     }
 }

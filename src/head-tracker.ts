@@ -1,6 +1,6 @@
 export function newHeadTracker(driver: Connex.Driver) {
     let head = { ...driver.head }
-    let resolvers: Array<() => void> = [];
+    let resolvers: Array<(head: Connex.Thor.Status['head']) => void> = [];
 
     (async () => {
         for (; ;) {
@@ -10,7 +10,7 @@ export function newHeadTracker(driver: Connex.Driver) {
                     head = { ...newHead }
                     const resolversCopy = resolvers
                     resolvers = []
-                    resolversCopy.forEach(r => r())
+                    resolversCopy.forEach(r => r(newHead))
                 } else {
                     await new Promise(resolve => setTimeout(resolve, 1 * 1000))
                 }
@@ -39,15 +39,16 @@ export function newHeadTracker(driver: Connex.Driver) {
             let lastHeadId = head.id
             return {
                 next: () => {
-                    return new Promise<void>(resolve => {
+                    return new Promise<Connex.Thor.Status['head']>(resolve => {
                         if (lastHeadId !== head.id) {
-                            lastHeadId = head.id
-                            return resolve()
+                            return resolve({ ...head })
                         }
-                        resolvers.push(() => {
-                            resolve()
-                            lastHeadId = head.id
+                        resolvers.push(newHead => {
+                            resolve({ ...newHead })
                         })
+                    }).then(h => {
+                        lastHeadId = h.id
+                        return h
                     })
                 }
             }
